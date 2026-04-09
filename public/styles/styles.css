@@ -1,0 +1,179 @@
+@font-face {
+    font-family: 'Glass TTY';
+    src: url('styles/Glass_TTY_VT220.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --green:        #33ff33;
+    --green-dim:    #1a8c1a;
+    --green-bright: #afffaf;
+    --green-glow:   0 0 3px #33ff33, 0 0 8px rgba(51,255,51,0.5), 0 0 15px rgba(51,255,51,0.3);
+    --red:          #ff4444;
+    --red-glow:     0 0 3px #ff4444, 0 0 8px rgba(255,68,68,0.5);
+    --cyan:         #00ffcc;
+    --cyan-glow:    0 0 3px #00ffcc, 0 0 8px rgba(0,255,204,0.5);
+    --yellow:       #ffdd00;
+    --yellow-glow:  0 0 3px #ffdd00, 0 0 8px rgba(255,221,0,0.4);
+}
+
+body {
+    background: #1a1a1a;
+    font-family: 'Glass TTY', monospace;
+    font-size: 20px;
+    font-weight: 400;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen {
+    background: #050505;
+    color: var(--green);
+    width: 100vw;
+    height: 100vh;
+    padding: 28px;
+    border-radius: 0;
+    overflow-y: auto;
+    position: relative;
+    text-shadow: var(--green-glow);
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.6);
+}
+
+.screen::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(
+        ellipse at 25% 15%,
+        rgba(255,255,255,0.04) 0%,
+        transparent 55%
+    );
+    pointer-events: none;
+}
+
+.screen::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+    );
+    pointer-events: none;
+}
+
+/* ── Cores de texto ───────────────────────── */
+
+/* padrão: verde normal — uso geral */
+.text-default {
+    color: var(--green);
+    text-shadow: var(--green-glow);
+}
+
+/* verde apagado — texto secundário, eco do input */
+.text-dim {
+    color: var(--green-dim);
+    text-shadow: none;
+}
+
+/* verde brilhante — títulos, destaques */
+.text-bright {
+    color: var(--green-bright);
+    text-shadow: var(--green-glow);
+}
+
+/* vermelho — erros */
+.text-error {
+    color: var(--red);
+    text-shadow: var(--red-glow);
+}
+
+/* ciano — confirmações, sucesso */
+.text-success {
+    color: var(--cyan);
+    text-shadow: var(--cyan-glow);
+}
+
+/* amarelo — avisos, informações importantes */
+.text-warn {
+    color: var(--yellow);
+    text-shadow: var(--yellow-glow);
+}
+
+/* ── Cursor e input ───────────────────────── */
+
+.cursor {
+    display: inline-block;
+    width: 10px;
+    height: 18px;
+    background: var(--green);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    box-shadow: var(--green-glow);
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+input {
+    background: transparent;
+    border: none;
+    color: var(--green);
+    font-family: 'Glass TTY', monospace;
+    font-size: 20px;
+    font-weight: 400;
+    outline: none;
+    caret-color: var(--green);
+    text-shadow: var(--green-glow);
+}
+
+.terminal-input {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    width: 0;
+    min-width: 0;
+    caret-color: transparent;
+}
+
+
+.header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--green-dim);
+    color: var(--green-dim);
+
+}
+
+.div-title{
+    border-bottom: 2px solid var(--green);
+    width: 45vw;
+    padding: 32px 0px;
+}
+
+.boot-p{
+    margin: 8px;
+}
+
+.boot-success{
+    margin: 8px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+}
+
+
+
+
+
