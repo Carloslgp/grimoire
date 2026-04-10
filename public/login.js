@@ -65,6 +65,10 @@ function waitInput(validValues = null) {
             input.style.width = Math.max(0, input.value.length * 12) + 'px';
         });
 
+        input.addEventListener("blur", (e)=> {
+            input.focus()
+        })
+
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const val = input.value.trim();
@@ -128,9 +132,8 @@ async function login(){
         inputEmail.focus()
 
 
-        inputEmail.focus()
 
-        inputEmail.addEventListener('blur', () => {
+        inputEmail.addEventListener('blur', (e) => {
             if(preechendoEmail){
                 inputEmail.focus()
             }
@@ -141,6 +144,8 @@ async function login(){
         inputEmail.addEventListener('keydown', async (e) => {
             if(e.key == "Enter"){ 
                     preechendoEmail = false
+                    paragrafoEmail.style.display = "none"
+
                     document.getElementById("cursorEmail").style.display = "none"
                     inputEmail.blur()
 
@@ -168,6 +173,56 @@ async function login(){
                 console.log(inputEmail.value)
             }
         })
+    }else if(resposta == 2){
+        terminal.innerHTML += `          
+            <p id="paragrafoEmail"><input class="terminal-input" id="3mail" type="text" name="grimoire_x7q" autocomplete="new-password" data-form-type="other"/><span id="cursorEmail" class="cursor"></span></p>
+            <p id="paragrafoPassword" style="display: none;"><input class="terminal-input" id="password" type="password" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorPsw" class="cursor"></span></p>  
+            <p id="paragrafoPasswordConfirm" style="display: none;"><input class="terminal-input" id="passwordConfirm" type="password" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorPswconfirm" class="cursor"></span></p>
+            `
+
+        document.querySelectorAll('.terminal-input').forEach(input => {
+            input.addEventListener('input', () => {
+                input.style.width = Math.max(0, input.value.length * 12) + 'px'
+            })
+        })
+
+        
+        let inputEmail = document.getElementById("3mail")
+        let paragrafoEmail = document.getElementById("paragrafoEmail")
+        let preechendoEmail = true
+
+        const labelEmail = document.createElement("span")
+        paragrafoEmail.insertBefore(labelEmail, inputEmail)
+        await typewrite(labelEmail, ">_ email: ")
+        inputEmail.focus()
+
+        inputEmail.addEventListener("blur", (e) =>{
+            if(preechendoEmail){
+                inputEmail.focus()
+            }
+        })
+
+        inputEmail.addEventListener("keydown", async (e) => {
+            if(e.key == "Enter"){
+                let senhasIguais
+                
+                do{
+                    senhasIguais = await receberSenhas();
+                }while(!senhasIguais)
+                console.log("sai do loop")
+            }
+        })
+
+
+
+        
+
+
+
+
+
+
+
     }
 
 
@@ -175,6 +230,91 @@ async function login(){
 
 
 }
+
+
+
+
+async function receberSenhas(){
+
+    let inputPassword = document.getElementById("password")
+    let inputPasswordConfirm = document.getElementById("passwordConfirm")
+    let paragrafoEmail = document.getElementById("paragrafoEmail")
+    let paragrafoPassword = document.getElementById("paragrafoPassword")
+    let paragrafoPasswordConfirm = document.getElementById("paragrafoPasswordConfirm")
+    let preechendoEmail = true
+    let preechendosenha = false
+    let preechendoSenhaConfirm = false
+
+    let senhasIguais = false;
+    paragrafoEmail.style.display = "none"
+    preechendoEmail = false
+    preechendosenha = true
+    
+
+
+    paragrafoPassword.style.display = "block"
+    const labelPassword = document.createElement("span")
+    paragrafoPassword.insertBefore(labelPassword, inputPassword)
+    inputPassword.focus()
+    await typewrite(labelPassword, ">_password: ")
+
+
+
+    inputPassword.addEventListener("blur", (e) =>{
+        if(preechendosenha){
+            inputPassword.focus()
+        }
+    })
+
+
+    const senha = await new Promise(resolve => {
+        inputPassword.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                resolve(inputPassword.value)
+            }
+        })
+    })
+
+    paragrafoPassword.style.display = "none"
+    preechendosenha = false
+    preechendoSenhaConfirm = true
+
+    paragrafoPasswordConfirm.style.display = "block"
+    const labelPasswordConfirm = document.createElement("span")
+    paragrafoPasswordConfirm.insertBefore(labelPasswordConfirm, inputPasswordConfirm)
+    inputPasswordConfirm.focus()
+    await typewrite(labelPasswordConfirm, "Confirm your password: ")
+
+    inputPasswordConfirm.addEventListener("blur", (e) =>{
+        if(preechendoSenhaConfirm){
+            inputPasswordConfirm.focus()
+        }
+    })
+
+    const confirmacao = await new Promise(resolve => {
+        inputPasswordConfirm.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                resolve(inputPasswordConfirm.value)
+            }
+        })
+    })
+
+    console.log(inputPassword.value)
+    console.log(inputPasswordConfirm.value)
+    if (senha === confirmacao) {
+        return true
+    } else {
+        // senhas diferentes — pode chamar de novo ou mostrar erro
+        return false
+    }
+        
+
+
+
+
+  
+}
+
 
 
 
