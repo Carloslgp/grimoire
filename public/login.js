@@ -1,4 +1,3 @@
-
 let terminal = document.getElementById("console")
 
 let users = []
@@ -36,12 +35,11 @@ async function boot() {
     terminal.appendChild(l3)
     await typewrite(l3, "Loading Mjölnir ...")
 
-        
     const l4 = document.createElement("p")
     l4.classList.add("boot-success", "text-success")
     terminal.appendChild(l4)
     await typewrite(l4, "SUCCESS! MAY THE FORCE BE WITH YOU")
-    
+
     return
 }
 
@@ -69,7 +67,7 @@ function waitInput(validValues = null) {
             input.style.width = Math.max(0, input.value.length * 12) + 'px';
         });
 
-        input.addEventListener("blur", (e)=> {
+        input.addEventListener("blur", (e) => {
             input.focus()
         })
 
@@ -78,7 +76,6 @@ function waitInput(validValues = null) {
                 const val = input.value.trim();
                 if (!validValues || validValues.includes(val)) {
                     cursor.style.display = 'none';
-
 
                     const typed = document.createElement("span");
                     typed.textContent = val;
@@ -94,12 +91,23 @@ function waitInput(validValues = null) {
     });
 }
 
-async function receberRespostas(){
+
+function waitEnter(input) {
+    return new Promise(resolve => {
+        function handler(e) {
+            if (e.key === "Enter") {
+                input.removeEventListener("keydown", handler)
+                resolve(input.value.trim())
+            }
+        }
+        input.addEventListener("keydown", handler)
+    })
+}
+
+async function receberRespostas() {
     const l1 = document.createElement("p")
     terminal.appendChild(l1)
     await typewrite(l1, ">_ [1] enter grimoire")
-
-        
 
     const l2 = document.createElement("p")
     terminal.appendChild(l2)
@@ -108,17 +116,37 @@ async function receberRespostas(){
     return await waitInput(['1', '2']);
 }
 
-async function sign(){
+async function esperarEmailValido(inputEmail) {
+    const pattern = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+    while (true) {
+        const valor = await waitEnter(inputEmail)
+
+        if (valor.toLowerCase() === "/quit") return null
+        if (pattern.test(valor)) return valor
+
+        const erroAnterior = document.querySelector(".text-error")
+        if (erroAnterior) erroAnterior.remove()
+
+        const errorMsg = document.createElement("p")
+        errorMsg.classList.add("text-error")
+        inputEmail.parentNode.parentNode.insertBefore(errorMsg, inputEmail.parentNode.nextSibling)
+        inputEmail.value = ""
+        inputEmail.style.width = "0px"
+        inputEmail.focus()
+        await typewrite(errorMsg, "Grimoire doesn't think this email is valid.")
+        setTimeout(() => errorMsg.remove(), 2000)
+    }
+}
+
+async function sign() {
 
     let resposta = await receberRespostas();
-   
-    let logged = false
-    let count = 0
 
-    if(resposta == 1){
+    if (resposta == 1) {
         const logged = await login();
-        
-        if(!logged){
+
+        if (!logged) {
             terminal.innerHTML = ""
             await sign()
         } else {
@@ -127,7 +155,7 @@ async function sign(){
             return true
         }
 
-    }else if(resposta == 2){
+    } else if (resposta == 2) {
         terminal.innerHTML += `          
             <p id="paragrafoEmail"><input class="terminal-input" id="3mail" type="text" name="grimoire_x7q" autocomplete="new-password" data-form-type="other"/><span id="cursorEmail" class="cursor"></span></p>
             <p id="paragrafoPassword" style="display: none;"><input class="terminal-input" id="password" type="password" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorPsw" class="cursor"></span></p>  
@@ -140,7 +168,6 @@ async function sign(){
             })
         })
 
-        
         let inputEmail = document.getElementById("3mail")
         let paragrafoEmail = document.getElementById("paragrafoEmail")
         let preechendoEmail = true
@@ -150,48 +177,50 @@ async function sign(){
         await typewrite(labelEmail, ">_ email: ")
         inputEmail.focus()
 
-        inputEmail.addEventListener("blur", (e) =>{
-            if(preechendoEmail){
-                inputEmail.focus()
-            }
+        inputEmail.addEventListener("blur", (e) => {
+            if (preechendoEmail) inputEmail.focus()
         })
 
-        inputEmail.addEventListener("keydown", async (e) => {
-            if(e.key == "Enter"){
-                let senhasIguais
-                let count = 0;
-                
-                do{ 
-                    
-                    if(count >= 1){
-                        let paragrafoPasswordConfirm = document.getElementById("paragrafoPasswordConfirm")
-                        paragrafoPasswordConfirm.style.display ="none"
-                        document.querySelectorAll("span").forEach (span => {
-                            span.innerText = ""
-                        })
+        const emailValido = await esperarEmailValido(inputEmail)
+        preechendoEmail = false
 
-                        document.querySelectorAll('.terminal-input').forEach(input => {
-                            input.style.width =  '0px'
-                        })
-                    }
+        if (!emailValido) {
+            terminal.innerHTML = ""
+            return await sign()
+        }
 
-                    user = await receberSenhas()
+        let count = 0
+        let user
 
-                    count++
-
-
-                }while(user.length == 0)
-                console.log("sai do loop")
-                user.unshift(inputEmail.value)
-                users.push(user)
-                terminal.textContent = ""
-                sign()
+        do {
+            if (count >= 1) {
+                let paragrafoPasswordConfirm = document.getElementById("paragrafoPasswordConfirm")
+                paragrafoPasswordConfirm.style.display = "none"
+                document.querySelectorAll("span").forEach(span => {
+                    span.innerText = ""
+                })
+                document.querySelectorAll('.terminal-input').forEach(input => {
+                    input.style.width = '0px'
+                })
             }
-        })
 
+            user = await receberSenhas()
+
+            if (user === null) {
+                terminal.innerHTML = ""
+                return await sign()
+            }
+
+            count++
+
+        } while (user.length == 0)
+
+        console.log("sai do loop")
+        user.unshift(emailValido)
+        users.push(user)
+        terminal.textContent = ""
+        sign()
     }
-
-
 }
 
 
@@ -229,112 +258,100 @@ async function login() {
         if (preechendoEmail) inputEmail.focus()
     })
 
-    const email = await new Promise(resolve => {
-        inputEmail.addEventListener("keydown", async (e) => {
-            if (e.key === "Enter") {
-                preechendoEmail = false
-                paragrafoEmail.style.display = "none"
+    const email = await esperarEmailValido(inputEmail)
+    preechendoEmail = false
 
-                const labelPassword = document.createElement("span")
+    if (!email) {
+        terminal.innerHTML = ""
+        return false
+    }
 
-                const cursorPassword = document.createElement("span")
-                cursorPassword.id = "cursorPsw"
-                cursorPassword.className = "cursor"
+    paragrafoEmail.style.display = "none"
 
-                paragrafoPassword.textContent = ""
-                paragrafoPassword.appendChild(labelPassword)
-                paragrafoPassword.appendChild(inputPassword)
-                paragrafoPassword.appendChild(cursorPassword)
-                paragrafoPassword.style.display = "block"
+    const labelPassword = document.createElement("span")
+    const cursorPassword = document.createElement("span")
+    cursorPassword.id = "cursorPsw"
+    cursorPassword.className = "cursor"
 
-                await typewrite(labelPassword, ">_ password: ")
-                inputPassword.focus()
-                resolve(inputEmail.value)
+    paragrafoPassword.textContent = ""
+    paragrafoPassword.appendChild(labelPassword)
+    paragrafoPassword.appendChild(inputPassword)
+    paragrafoPassword.appendChild(cursorPassword)
+    paragrafoPassword.style.display = "block"
 
-            }
-        })
-    })
-
-
+    await typewrite(labelPassword, ">_ password: ")
+    inputPassword.focus()
 
     let preechendoSenha = true
     inputPassword.addEventListener('blur', () => {
         if (preechendoSenha) inputPassword.focus()
     })
 
-    const senha = await new Promise(resolve => {
-        inputPassword.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                resolve(inputPassword.value)
+    const senha = await waitEnter(inputPassword)
+    preechendoSenha = false
 
-            }
-        })
-    })
+    if (senha.toLowerCase() === "/quit") {
+        terminal.innerHTML = ""
+        return false
+    }
 
-    console.log(inputEmail.value)
-    console.log(senha)
-    const logado = users.some(user => email === user[0] && senha === user[1]);
-    if (logado) console.log("logou");
-    return logado;
+    if (senha.length < 8) {
+        const errorMsg = document.createElement("p")
+        errorMsg.classList.add("text-error")
+        terminal.appendChild(errorMsg)
+        await typewrite(errorMsg, "Password must be at least 8 characters.")
+        setTimeout(() => errorMsg.remove(), 2000)
+        terminal.innerHTML = ""
+        return false
+    }
 
-
+    const logado = users.some(user => email === user[0] && senha === user[1])
+    if (logado) console.log("logou")
+    return logado
 }
 
 
-
-
-async function receberSenhas(){
-
-
-
+async function receberSenhas() {
 
     let inputPassword = document.getElementById("password")
     let inputPasswordConfirm = document.getElementById("passwordConfirm")
     let paragrafoEmail = document.getElementById("paragrafoEmail")
     let paragrafoPassword = document.getElementById("paragrafoPassword")
     let paragrafoPasswordConfirm = document.getElementById("paragrafoPasswordConfirm")
-    let preechendoEmail = true
     let preechendosenha = false
     let preechendoSenhaConfirm = false
 
     inputPassword.value = ""
     inputPasswordConfirm.value = ""
 
-
-
-
-    let senhasIguais = false
     paragrafoEmail.style.display = "none"
-    preechendoEmail = false
     preechendosenha = true
 
-
-    
     paragrafoPassword.style.display = "block"
     const labelPassword = document.createElement("span")
     paragrafoPassword.insertBefore(labelPassword, inputPassword)
     inputPassword.focus()
     await typewrite(labelPassword, ">_password: ")
 
-
-
-    inputPassword.addEventListener("blur", (e) =>{
-        if(preechendosenha){
-            inputPassword.focus()
-        }
+    inputPassword.addEventListener("blur", (e) => {
+        if (preechendosenha) inputPassword.focus()
     })
 
+    const senha = await waitEnter(inputPassword)
+    preechendosenha = false
 
-    const senha = await new Promise(resolve => {
-        inputPassword.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                resolve(inputPassword.value)
-            }
-        })
-    })
+    if (senha.toLowerCase() === "/quit") return null
+
+    if (senha.length < 8) {
+        const errorMsg = document.createElement("p")
+        errorMsg.classList.add("text-error")
+        terminal.appendChild(errorMsg)
+        await typewrite(errorMsg, "Password must be at least 8 characters.")
+        setTimeout(() => errorMsg.remove(), 2000)
+        return []
+    }
 
     paragrafoPassword.style.display = "none"
-    preechendosenha = false
     preechendoSenhaConfirm = true
 
     paragrafoPasswordConfirm.style.display = "block"
@@ -343,48 +360,39 @@ async function receberSenhas(){
     inputPasswordConfirm.focus()
     await typewrite(labelPasswordConfirm, "Confirm your password: ")
 
-    inputPasswordConfirm.addEventListener("blur", (e) =>{
-        if(preechendoSenhaConfirm){
-            inputPasswordConfirm.focus()
-        }
+    inputPasswordConfirm.addEventListener("blur", (e) => {
+        if (preechendoSenhaConfirm) inputPasswordConfirm.focus()
     })
 
-    const confirmacao = await new Promise(resolve => {
-        inputPasswordConfirm.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                resolve(inputPasswordConfirm.value)
-            }
-        })
-    })
+    const confirmacao = await waitEnter(inputPasswordConfirm)
+    preechendoSenhaConfirm = false
 
+    if (confirmacao.toLowerCase() === "/quit") return null
 
     if (senha === confirmacao) {
         return [senha]
     } else {
+        const errorMsg = document.createElement("p")
+        errorMsg.classList.add("text-error")
+        terminal.appendChild(errorMsg)
+        await typewrite(errorMsg, "Passwords don't match. Try again.")
+        setTimeout(() => errorMsg.remove(), 2000)
 
         return []
     }
-  
 }
-
-
-
 
 
 const hour = document.getElementById("hour")
 
-function getHour(){
+function getHour() {
     const now = new Date();
-    return now.toTimeString().slice(0,8)
+    return now.toTimeString().slice(0, 8)
 }
 
-function updateHour(){
+function updateHour() {
     hour.textContent = getHour();
 }
-
-
-
-
 
 updateHour();
 setInterval(updateHour, 1000)
@@ -395,5 +403,3 @@ async function init() {
 }
 
 init();
-
-

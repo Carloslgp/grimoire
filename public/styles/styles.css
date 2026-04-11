@@ -72,45 +72,47 @@ body {
     pointer-events: none;
 }
 
-/* ── Cores de texto ───────────────────────── */
-
-/* padrão: verde normal — uso geral */
 .text-default {
     color: var(--green);
     text-shadow: var(--green-glow);
 }
 
-/* verde apagado — texto secundário, eco do input */
+
 .text-dim {
     color: var(--green-dim);
     text-shadow: none;
 }
 
-/* verde brilhante — títulos, destaques */
+
 .text-bright {
     color: var(--green-bright);
     text-shadow: var(--green-glow);
 }
 
-/* vermelho — erros */
+
 .text-error {
     color: var(--red);
     text-shadow: var(--red-glow);
 }
 
-/* ciano — confirmações, sucesso */
+.text-important {
+    color: var(--red);
+    text-shadow: var(--red-glow);
+}
+
+
 .text-success {
     color: var(--cyan);
     text-shadow: var(--cyan-glow);
 }
 
-/* amarelo — avisos, informações importantes */
+
 .text-warn {
     color: var(--yellow);
     text-shadow: var(--yellow-glow);
 }
 
-/* ── Cursor e input ───────────────────────── */
+
 
 .cursor {
     display: inline-block;
@@ -159,7 +161,7 @@ input {
 
 .div-title{
     border-bottom: 2px solid var(--green);
-    width: 45vw;
+    width: 55vw;
     padding: 32px 0px;
 }
 
