@@ -1,5 +1,9 @@
 
 let terminal = document.getElementById("console")
+
+let users = []
+
+
 function typewrite(element, text, speed = 28) {
     return new Promise(resolve => {
         let i = 0;
@@ -16,7 +20,7 @@ function typewrite(element, text, speed = 28) {
 }
 
 async function boot() {
-    
+    terminal.textContent = ""
     const l1 = document.createElement("p")
     l1.classList = "boot-p"
     terminal.appendChild(l1)
@@ -90,10 +94,7 @@ function waitInput(validValues = null) {
     });
 }
 
-
-async function login(){
-
-
+async function receberRespostas(){
     const l1 = document.createElement("p")
     terminal.appendChild(l1)
     await typewrite(l1, ">_ [1] enter grimoire")
@@ -104,75 +105,28 @@ async function login(){
     terminal.appendChild(l2)
     await typewrite(l2, ">_ [2] create grimoire")
 
-    const resposta = await waitInput(['1', '2']);
+    return await waitInput(['1', '2']);
+}
+
+async function sign(){
+
+    let resposta = await receberRespostas();
+   
+    let logged = false
+    let count = 0
 
     if(resposta == 1){
-        terminal.innerHTML += `          
-            <p id="paragrafoEmail"><input class="terminal-input" id="email" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorEmail" class="cursor"></span></p>
-            <p id="paragrafoPassword" style="display: none;"><input class="terminal-input" id="password" type="password" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorPsw" class="cursor"></span></p>  `
-
+        const logged = await login();
         
+        if(!logged){
+            terminal.innerHTML = ""
+            await sign()
+        } else {
+            console.log("logou!")
+            terminal.innerHTML = ""
+            return true
+        }
 
-
-        document.querySelectorAll('.terminal-input').forEach(input => {
-            input.addEventListener('input', () => {
-                input.style.width = Math.max(0, input.value.length * 12) + 'px'
-            })
-        })
-
-        let inputEmail = document.getElementById("email")
-        let inputPassword = document.getElementById("password")
-        let paragrafoEmail = document.getElementById("paragrafoEmail")
-        let paragrafoPassword = document.getElementById("paragrafoPassword")
-        let preechendoEmail = true
-
-        const labelEmail = document.createElement("span")
-        paragrafoEmail.insertBefore(labelEmail, inputEmail)
-        await typewrite(labelEmail, ">_ email: ")
-        inputEmail.focus()
-
-
-
-        inputEmail.addEventListener('blur', (e) => {
-            if(preechendoEmail){
-                inputEmail.focus()
-            }
-
-        })
-
-
-        inputEmail.addEventListener('keydown', async (e) => {
-            if(e.key == "Enter"){ 
-                    preechendoEmail = false
-                    paragrafoEmail.style.display = "none"
-
-                    document.getElementById("cursorEmail").style.display = "none"
-                    inputEmail.blur()
-
-                    paragrafoPassword.style.display = "block"
-                    const labelPassword = document.createElement("span")
-                    paragrafoPassword.insertBefore(labelPassword, inputPassword)
-                    await typewrite(labelPassword, ">_ password: ")
-
-                    document.getElementById("cursorPsw").style.display = "inline-block"
-                    inputPassword.focus()
-            }
-        })
-
-        let preechendoSenha = true
-        inputPassword.addEventListener('blur', () => {
-            if(preechendoSenha){
-                inputPassword.focus()
-            }
-
-        })
-
-        inputPassword.addEventListener('keydown', (e) => {
-            if(e.key == "Enter"){ 
-                console.log(inputPassword.value)
-                console.log(inputEmail.value)
-            }
-        })
     }else if(resposta == 2){
         terminal.innerHTML += `          
             <p id="paragrafoEmail"><input class="terminal-input" id="3mail" type="text" name="grimoire_x7q" autocomplete="new-password" data-form-type="other"/><span id="cursorEmail" class="cursor"></span></p>
@@ -182,7 +136,7 @@ async function login(){
 
         document.querySelectorAll('.terminal-input').forEach(input => {
             input.addEventListener('input', () => {
-                input.style.width = Math.max(0, input.value.length * 12) + 'px'
+                input.style.width = Math.max(0, input.value.length * 11) + 'px'
             })
         })
 
@@ -205,28 +159,123 @@ async function login(){
         inputEmail.addEventListener("keydown", async (e) => {
             if(e.key == "Enter"){
                 let senhasIguais
+                let count = 0;
                 
-                do{
-                    senhasIguais = await receberSenhas();
-                }while(!senhasIguais)
+                do{ 
+                    
+                    if(count >= 1){
+                        let paragrafoPasswordConfirm = document.getElementById("paragrafoPasswordConfirm")
+                        paragrafoPasswordConfirm.style.display ="none"
+                        document.querySelectorAll("span").forEach (span => {
+                            span.innerText = ""
+                        })
+
+                        document.querySelectorAll('.terminal-input').forEach(input => {
+                            input.style.width =  '0px'
+                        })
+                    }
+
+                    user = await receberSenhas()
+
+                    count++
+
+
+                }while(user.length == 0)
                 console.log("sai do loop")
+                user.unshift(inputEmail.value)
+                users.push(user)
+                terminal.textContent = ""
+                sign()
             }
         })
-
-
-
-        
-
-
-
-
-
-
 
     }
 
 
+}
 
+
+async function login() {
+    terminal.innerHTML += `          
+        <p id="paragrafoEmail"><input class="terminal-input" id="email" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorEmail" class="cursor"></span></p>
+        <p id="paragrafoPassword" style="display: none;"><input class="terminal-input" id="password" type="password" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorPsw" class="cursor"></span></p>`
+
+    document.querySelectorAll('.terminal-input').forEach(input => {
+        input.addEventListener('input', () => {
+            input.style.width = Math.max(0, input.value.length * 11) + 'px'
+        })
+    })
+
+    let inputEmail = document.getElementById("email")
+    let inputPassword = document.getElementById("password")
+    let paragrafoEmail = document.getElementById("paragrafoEmail")
+    let paragrafoPassword = document.getElementById("paragrafoPassword")
+    let preechendoEmail = true
+
+    const labelEmail = document.createElement("span")
+    const cursorEmail = document.createElement("span")
+    cursorEmail.id = "cursorEmail"
+    cursorEmail.className = "cursor"
+
+    paragrafoEmail.textContent = ""
+    paragrafoEmail.appendChild(labelEmail)
+    paragrafoEmail.appendChild(inputEmail)
+    paragrafoEmail.appendChild(cursorEmail)
+
+    await typewrite(labelEmail, ">_ email: ")
+    inputEmail.focus()
+
+    inputEmail.addEventListener('blur', () => {
+        if (preechendoEmail) inputEmail.focus()
+    })
+
+    const email = await new Promise(resolve => {
+        inputEmail.addEventListener("keydown", async (e) => {
+            if (e.key === "Enter") {
+                preechendoEmail = false
+                paragrafoEmail.style.display = "none"
+
+                const labelPassword = document.createElement("span")
+
+                const cursorPassword = document.createElement("span")
+                cursorPassword.id = "cursorPsw"
+                cursorPassword.className = "cursor"
+
+                paragrafoPassword.textContent = ""
+                paragrafoPassword.appendChild(labelPassword)
+                paragrafoPassword.appendChild(inputPassword)
+                paragrafoPassword.appendChild(cursorPassword)
+                paragrafoPassword.style.display = "block"
+
+                await typewrite(labelPassword, ">_ password: ")
+                inputPassword.focus()
+                resolve(inputEmail.value)
+
+            }
+        })
+    })
+
+
+
+    let preechendoSenha = true
+    inputPassword.addEventListener('blur', () => {
+        if (preechendoSenha) inputPassword.focus()
+    })
+
+    const senha = await new Promise(resolve => {
+        inputPassword.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                resolve(inputPassword.value)
+
+            }
+        })
+    })
+
+    console.log(inputEmail.value)
+    console.log(senha)
+    const logado = users.some(user => email === user[0] && senha === user[1]);
+    if (logado) console.log("logou");
+    return logado;
 
 
 }
@@ -235,6 +284,9 @@ async function login(){
 
 
 async function receberSenhas(){
+
+
+
 
     let inputPassword = document.getElementById("password")
     let inputPasswordConfirm = document.getElementById("passwordConfirm")
@@ -245,13 +297,19 @@ async function receberSenhas(){
     let preechendosenha = false
     let preechendoSenhaConfirm = false
 
-    let senhasIguais = false;
+    inputPassword.value = ""
+    inputPasswordConfirm.value = ""
+
+
+
+
+    let senhasIguais = false
     paragrafoEmail.style.display = "none"
     preechendoEmail = false
     preechendosenha = true
+
+
     
-
-
     paragrafoPassword.style.display = "block"
     const labelPassword = document.createElement("span")
     paragrafoPassword.insertBefore(labelPassword, inputPassword)
@@ -299,19 +357,13 @@ async function receberSenhas(){
         })
     })
 
-    console.log(inputPassword.value)
-    console.log(inputPasswordConfirm.value)
+
     if (senha === confirmacao) {
-        return true
+        return [senha]
     } else {
-        // senhas diferentes — pode chamar de novo ou mostrar erro
-        return false
+
+        return []
     }
-        
-
-
-
-
   
 }
 
@@ -339,7 +391,7 @@ setInterval(updateHour, 1000)
 
 async function init() {
     await boot();
-    await login();
+    await sign();
 }
 
 init();
