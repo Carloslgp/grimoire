@@ -365,7 +365,7 @@ async function login() {
         }
 
         sessionToken = dados.token;
-        console.log("logou!");
+        localStorage.setItem("grimoire_token", dados.token);
         return true;
 
     } catch {
@@ -465,9 +465,69 @@ function updateHour() {
 updateHour();
 setInterval(updateHour, 1000)
 
+
+async function checkSession() {
+    const savedToken = localStorage.getItem("grimoire_token")
+
+    if(!savedToken){
+        await boot();
+        if(await sign()){
+            await grimoire()
+        }
+        return
+    }
+
+    try{
+
+        const response = await fetch("http://localhost:3000/api/verify", {
+            headers: {"Authorization": `Bearer ${savedToken}`}
+        })
+
+        if(response.ok){
+            sessionToken  = savedToken
+            await grimoire()
+        }else{
+            localStorage.removeItem("grimoire_token")
+            await boot();
+            if(await sign()){
+                await grimoire()
+            }
+        }
+
+
+    }catch(error){
+        localStorage.removeItem("grimoire_token")
+        await boot();
+        if(await sign()){
+            await grimoire()
+        }
+    }
+
+
+
+}
+
+
+
+
+
+async function grimoire() {
+    terminal.innerHTML = ""
+    const msg = document.createElement("p")
+    msg.classList.add("boot-p")
+    terminal.appendChild(msg)
+    await typewrite(msg, "Welcome back, traveler.")
+}
+
+
+
+
+
+
+
+
 async function init() {
-    await boot();
-    await sign();
+    await checkSession();
 }
 
 init();

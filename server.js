@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const supabase = require('./supabase');
 const jwt = require("jsonwebtoken");
+const authMiddleware = require("./middlewares/authMiddleware")
 
 const app = express()
 app.use(express.json())
@@ -95,27 +96,10 @@ app.post("/api/login", async(req, res) =>{
 
 })
 
-function autenticar(req, res, next){
-    const authHeader = req.headers.authorization
 
-    if(!authHeader){
-        return res.status(401).json({mensagem : "TOKEN NÃO FORNECIDO"})
-    }
-
-    const token = authHeader.split(" ")[1]
-
-    try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        req.usuario = decoded
-        next();
-    }catch(error){
-        return res.status(401).json({error: "Token Inválido"})
-    }
-
-
-
-}
-
+app.get("/api/verify", authMiddleware, (req, res) => {
+    res.json({ mensagem: "TOKEN VÁLIDO.", userId: req.userId, email: req.userEmail });
+});
 
 
 
