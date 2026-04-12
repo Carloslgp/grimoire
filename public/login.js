@@ -1,6 +1,7 @@
 let terminal = document.getElementById("console")
 
 let users = []
+let sessionToken = null;
 
 
 function typewrite(element, text, speed = 28) {
@@ -218,7 +219,7 @@ async function sign() {
         console.log("sai do loop")
         user.unshift(emailValido)
         try{
-            const resposta = await fetch("http://localhost:3000/api/login", {
+            const resposta = await fetch("http://localhost:3000/api/register", {
                 method: "POST",
                 headers: {
                     'Content-Type':"application/json"
@@ -342,9 +343,39 @@ async function login() {
         return false
     }
 
-    const logado = users.some(user => email === user[0] && senha === user[1])
-    if (logado) console.log("logou")
-    return logado
+    try {
+        const resposta = await fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, senha })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            const errorMsg = document.createElement("p");
+            errorMsg.classList.add("text-error");
+            terminal.appendChild(errorMsg);
+            await typewrite(errorMsg, `>_ ERRO: ${dados.mensagem}`);
+            await new Promise(r => setTimeout(r, 2000));
+            terminal.innerHTML = "";
+            return false;
+        }
+
+        sessionToken = dados.token;
+        console.log("logou!");
+        return true;
+
+    } catch {
+        const erroSpan = document.createElement("span");
+        terminal.appendChild(erroSpan);
+        await typewrite(erroSpan, ">_ ERRO DE CONEXÃO. TENTE NOVAMENTE.");
+        await new Promise(r => setTimeout(r, 2000));
+        terminal.innerHTML = "";
+        return false;
+    }
 }
 
 
