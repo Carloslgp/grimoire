@@ -217,9 +217,46 @@ async function sign() {
 
         console.log("sai do loop")
         user.unshift(emailValido)
-        users.push(user)
-        terminal.textContent = ""
-        sign()
+        try{
+            const resposta = await fetch("http://localhost:3000/api/login", {
+                method: "POST",
+                headers: {
+                    'Content-Type':"application/json"
+                },
+                body: JSON.stringify({
+                    email: user[0],
+                    senha: user[1],
+                    senhaConfirm: user[2]
+                })
+            })
+            const dados = await resposta.json()
+            
+            if(!resposta.ok){
+                const erroSpan = document.createElement("span")
+                terminal.appendChild(erroSpan)
+                await typewrite(erroSpan, `>_ERRO ${dados.mensagem}`)
+
+                await new Promise(r => setTimeout(r, 2000));
+
+                terminal.textContent = "";
+                return await sign();
+            }
+
+            console.log("Registrado!", dados);
+            terminal.textContent = "";
+            return await sign();
+
+        }catch{
+            const erroSpan = document.createElement("span");
+            terminal.appendChild(erroSpan);
+            await typewrite(erroSpan, ">_ ERRO DE CONEXÃO. TENTE NOVAMENTE.");
+            
+            await new Promise(r => setTimeout(r, 2000));
+            terminal.textContent = "";
+            return await sign();
+
+        }   
+
     }
 }
 
@@ -370,7 +407,7 @@ async function receberSenhas() {
     if (confirmacao.toLowerCase() === "/quit") return null
 
     if (senha === confirmacao) {
-        return [senha]
+        return [senha, confirmacao]
     } else {
         const errorMsg = document.createElement("p")
         errorMsg.classList.add("text-error")
