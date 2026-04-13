@@ -65,7 +65,7 @@ function waitInput(validValues = null) {
         input.focus();
 
         input.addEventListener('input', () => {
-            input.style.width = Math.max(0, input.value.length * 12) + 'px';
+            input.style.width = Math.max(0, input.value.length * 11) + 'px';
         });
 
         input.addEventListener("blur", (e) => {
@@ -149,7 +149,7 @@ async function sign() {
 
         if (!logged) {
             terminal.innerHTML = ""
-            await sign()
+            return await sign()
         } else {
             console.log("logou!")
             terminal.innerHTML = ""

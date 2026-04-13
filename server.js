@@ -76,13 +76,13 @@ app.post("/api/login", async(req, res) =>{
         .single();
 
     if(error || !data){
-        return res.status(401).json({mensagem: "USUÁRIO NÃO ENCONTRADO"})
+        return res.status(401).json({mensagem: "SENHA OU EMAIL INCORRETOS"})
     }
 
     const senhaValida = await bcrypt.compare(senha, data.senha_hash)
 
     if(!senhaValida){
-        return res.status(401).json({error: "SENHA OU EMAIL INCORRETOS"})
+        return res.status(401).json({mensagem: "SENHA OU EMAIL INCORRETOS"})
     }
 
     const token = jwt.sign(
