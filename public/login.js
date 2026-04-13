@@ -19,6 +19,25 @@ function typewrite(element, text, speed = 28) {
     });
 }
 
+function showLoading(text) {
+    const p = document.createElement("p");
+    p.classList.add("boot-p");
+    terminal.appendChild(p);
+
+    let dots = 0;
+    const interval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        p.textContent = text + ".".repeat(dots);
+    }, 400);
+
+    return {
+        stop() {
+            clearInterval(interval);
+            p.remove();
+        }
+    };
+}
+
 async function boot() {
     terminal.textContent = ""
     const l1 = document.createElement("p")
@@ -65,7 +84,7 @@ function waitInput(validValues = null) {
         input.focus();
 
         input.addEventListener('input', () => {
-            input.style.width = Math.max(0, input.value.length * 11) + 'px';
+            input.style.width = (input.value.length) + 'ch';
         });
 
         input.addEventListener("blur", (e) => {
@@ -165,7 +184,7 @@ async function sign() {
 
         document.querySelectorAll('.terminal-input').forEach(input => {
             input.addEventListener('input', () => {
-                input.style.width = Math.max(0, input.value.length * 11) + 'px'
+                input.style.width = (input.value.length) + 'ch';
             })
         })
 
@@ -218,6 +237,7 @@ async function sign() {
 
         console.log("sai do loop")
         user.unshift(emailValido)
+        const loading = showLoading("Creating new grimoire");
         try{
             const resposta = await fetch("http://localhost:3000/api/register", {
                 method: "POST",
@@ -230,6 +250,7 @@ async function sign() {
                     senhaConfirm: user[2]
                 })
             })
+            loading.stop();
             const dados = await resposta.json()
             
             if(!resposta.ok){
@@ -248,6 +269,7 @@ async function sign() {
             return await sign();
 
         }catch{
+            loading.stop();
             const erroSpan = document.createElement("span");
             terminal.appendChild(erroSpan);
             await typewrite(erroSpan, ">_ ERRO DE CONEXÃO. TENTE NOVAMENTE.");
@@ -269,7 +291,7 @@ async function login() {
 
     document.querySelectorAll('.terminal-input').forEach(input => {
         input.addEventListener('input', () => {
-            input.style.width = Math.max(0, input.value.length * 11) + 'px'
+            input.style.width = (input.value.length) + 'ch';
         })
     })
 
@@ -342,7 +364,7 @@ async function login() {
         terminal.innerHTML = ""
         return false
     }
-
+    const loading = showLoading("Logging in");
     try {
         const resposta = await fetch("http://localhost:3000/api/login", {
             method: "POST",
@@ -351,6 +373,7 @@ async function login() {
             },
             body: JSON.stringify({ email, senha })
         });
+        loading.stop();
 
         const dados = await resposta.json();
 
@@ -369,6 +392,7 @@ async function login() {
         return true;
 
     } catch {
+        loading.stop();
         const erroSpan = document.createElement("span");
         terminal.appendChild(erroSpan);
         await typewrite(erroSpan, ">_ ERRO DE CONEXÃO. TENTE NOVAMENTE.");

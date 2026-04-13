@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
+const supabase = require("../supabase")
 
-function authMiddleware(req, res, next){
+async function authMiddleware(req, res, next){
     const authHeader = req.headers.authorization
 
     if(!authHeader || !authHeader.startsWith("Bearer ")){
@@ -11,6 +12,16 @@ function authMiddleware(req, res, next){
 
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const{data: usuario, error} = await supabase
+            .from("users")
+            .select("id")
+            .eq("id", decoded.id)
+            .single()
+            
+        if(error || !usuario){
+            return res.status(401).json({error: "Usuário não encontrado"})
+        }
+
         req.usuario = decoded
         next();
     }catch(error){
