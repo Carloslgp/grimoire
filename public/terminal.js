@@ -1,3 +1,16 @@
+function attachCursorTracking(input, cursor) {
+    function update() {
+        const offset = input.value.length - input.selectionStart;
+        cursor.style.transform = `translateX(-${offset}ch)`;
+    }
+    input.addEventListener('input', update);
+    input.addEventListener('keyup', update);
+    input.addEventListener('click', update);
+    input.addEventListener('select', update);
+    input.addEventListener('focus', update);
+    update();
+}
+
 function typewrite(element, text, speed = 28) {
     return new Promise(resolve => {
         let i = 0;
@@ -55,6 +68,8 @@ function waitInput(validValues = null) {
         input.addEventListener('input', () => {
             input.style.width = (input.value.length) + 'ch';
         });
+
+        attachCursorTracking(input, cursor);
 
         input.addEventListener("blur", (e) => {
             input.focus()
@@ -205,16 +220,55 @@ async function criarInputTerminal(texto){
     terminal.innerHTML += `<p id="paragrafoConsole"><input class="terminal-input" id="inputConsole" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorTerminal" class="cursor"></span></p>`
     paragrafoConsole = document.getElementById("paragrafoConsole")
     inputConsole = document.getElementById("inputConsole")
+    const cursorTerminal = document.getElementById("cursorTerminal")
     inputConsole.focus()
     console.log(inputConsole)
+
     inputConsole.addEventListener('input', () => {
         inputConsole.style.width = (inputConsole.value.length) + 'ch';
     })
 
+    attachCursorTracking(inputConsole, cursorTerminal)
 
     inputConsole.addEventListener("blur", () => {
         inputConsole.focus()
-    })  
+    })
+
+    const history = [];
+    let historyIndex = -1;
+
+    inputConsole.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            const cmd = inputConsole.value.trim();
+            if (cmd) {
+                history.unshift(cmd);
+                historyIndex = -1;
+            }
+            return;
+        }
+
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                inputConsole.value = history[historyIndex];
+                inputConsole.style.width = inputConsole.value.length + "ch";
+            }
+            return;
+        }
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                historyIndex--;
+                inputConsole.value = history[historyIndex];
+            } else {
+                historyIndex = -1;
+                inputConsole.value = "";
+            }
+            inputConsole.style.width = inputConsole.value.length + "ch";
+        }
+    });
 
     const labelConsole = document.createElement("span")
     paragrafoConsole.insertBefore(labelConsole, inputConsole)

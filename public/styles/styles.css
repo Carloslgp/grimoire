@@ -117,12 +117,13 @@ body {
 
 .cursor {
     display: inline-block;
-    width: 10px;
+    width: 1ch;
     height: 18px;
     background: var(--green);
     animation: blink 1s step-end infinite;
     vertical-align: middle;
     box-shadow: var(--green-glow);
+    mix-blend-mode: difference;
 }
 
 @keyframes blink {

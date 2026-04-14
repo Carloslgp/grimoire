@@ -61,6 +61,10 @@ async function sign() {
             })
         })
 
+        attachCursorTracking(document.getElementById("3mail"), document.getElementById("cursorEmail"))
+        attachCursorTracking(document.getElementById("password"), document.getElementById("cursorPsw"))
+        attachCursorTracking(document.getElementById("passwordConfirm"), document.getElementById("cursorPswconfirm"))
+
         let inputEmail = document.getElementById("3mail")
         let paragrafoEmail = document.getElementById("paragrafoEmail")
         let preechendoEmail = true
@@ -184,6 +188,8 @@ async function login() {
     paragrafoEmail.appendChild(inputEmail)
     paragrafoEmail.appendChild(cursorEmail)
 
+    attachCursorTracking(inputEmail, cursorEmail)
+
     await typewrite(labelEmail, ">_ email: ")
     inputEmail.focus()
 
@@ -211,6 +217,8 @@ async function login() {
     paragrafoPassword.appendChild(inputPassword)
     paragrafoPassword.appendChild(cursorPassword)
     paragrafoPassword.style.display = "block"
+
+    attachCursorTracking(inputPassword, cursorPassword)
 
     await typewrite(labelPassword, ">_ password: ")
     inputPassword.focus()
