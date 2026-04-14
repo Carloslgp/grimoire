@@ -88,7 +88,7 @@ app.post("/api/login", async(req, res) =>{
     const token = jwt.sign(
         {id: data.id, email: data.email},
         process.env.JWT_SECRET,
-        {expiresIn: "15m"}
+        {expiresIn: "7d"}
     )
 
     res.json({token})

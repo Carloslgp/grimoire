@@ -98,6 +98,7 @@ body {
 .text-important {
     color: var(--red);
     text-shadow: var(--red-glow);
+    font-size: 20px;
 }
 
 
@@ -177,5 +178,22 @@ input {
 
 
 
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
 
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #33ff33;
+    box-shadow: 0 0 6px #33ff33;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #33ff33;
+    box-shadow: 0 0 12px #33ff33;
+}
 
