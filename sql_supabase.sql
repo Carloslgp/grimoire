@@ -4,3 +4,8 @@ CREATE TABLE users (
   senha_hash TEXT NOT NULL,
   criado_em TIMESTAMP DEFAULT now()
 );
+create table token_blacklist (
+  id uuid default gen_random_uuid() primary key,
+  token text not null,
+  invalidated_at timestamp default now()
+);

@@ -1,3 +1,50 @@
+const unknownCommandMessages = {
+  1: [
+    `"{cmd}" is not a command. Try "help" if you're lost.`,
+    `Unknown command: "{cmd}". Happens to the best of us. You are not the best of us.`,
+    `No spell called "{cmd}" exists. Close, maybe. But no.`,
+    `"{cmd}"? The grimoire doesn't recognize that. Yet.`,
+    `Command not found: "{cmd}". Check the spelling, check the docs, check yourself.`,
+  ],
+  2: [
+    `"{cmd}" again? Still not a command.`,
+    `The grimoire is starting to notice a pattern. "{cmd}" is wrong. Again.`,
+    `"{cmd}" — unknown. As was your last attempt. Coincidence?`,
+    `Twice now. "{cmd}" has failed twice. The grimoire is taking notes.`,
+    `Still not a command: "{cmd}". The definition of insanity sends its regards.`,
+  ],
+  3: [
+    `THREE times. "{cmd}". Three. The grimoire is concerned.`,
+    `"{cmd}" is not a command. It was not a command the first time either. Or the second.`,
+    `The grimoire has now rejected "{cmd}" more times than it would like to admit.`,
+    `"{cmd}" — still wrong. Impressively, consistently wrong.`,
+    `At this point the grimoire suspects you are doing this on purpose. "{cmd}" is not a command.`,
+  ],
+  4: [
+    `"{cmd}". Four attempts. The grimoire is no longer concerned. It is annoyed.`,
+    `You have failed to enter a valid command four times. The grimoire has begun to judge you.`,
+    `"{cmd}" — not a command. The grimoire is losing patience and it never had much to begin with.`,
+    `Four times, "{cmd}". Four. The grimoire would like you to stop.`,
+    `The grimoire is starting to take "{cmd}" personally. Stop it.`,
+  ],
+  5: [
+    `FIVE. "{cmd}". FIVE TIMES.\nThe grimoire is furious. Run "help" or close the terminal.`,
+    `"{cmd}" has been rejected five times. The grimoire questions every decision that led you here.`,
+    `Five failed attempts. "{cmd}". The grimoire has seen evil things. You are one of them.`,
+    `At five errors the grimoire considered shutting down. It stayed. It regrets it.`,
+    `"{cmd}" — five times wrong. The grimoire is not okay. You are not okay. Nothing is okay.`,
+  ],
+  max: [
+    `"{cmd}". Again. THE GRIMOIRE IS DONE BEING POLITE.\nThis is not a command. Run "help". NOW.`,
+    `The grimoire has lost count of how many times you have typed "{cmd}".\nIt has also lost the will to help. "help". Use it.`,
+    `"{cmd}" — WRONG. STILL WRONG. ALWAYS WRONG.\nThe grimoire is screaming internally. Run "help".`,
+    `You absolute menace. "{cmd}" is not a command.\nIt never was. It never will be. "help" exists for a reason.`,
+    `The grimoire has endured "{cmd}" too many times.\nIt is tired. It is angry. It is begging you: "help".`,
+    `"{cmd}" — unknown, unwanted, unexecuted.\nThe grimoire has transcended frustration into something darker. "help".`,
+  ]
+};
+
+
 function attachCursorTracking(input, cursor) {
     function update() {
         const offset = input.value.length - input.selectionStart;
@@ -301,7 +348,7 @@ async function typeHelp() {
         "  grimoire categories                              — list all categories",
         " ",
         "  help                                             — show this menu",
-        "  cls                                              — clear the terminal",
+        "  clear                                            — clear the terminal",
         "  logout                                           — exit your grimoire",
     ]
 
@@ -309,10 +356,45 @@ async function typeHelp() {
         const p = document.createElement("p")
         p.classList = "boot-p"
         terminal.appendChild(p)
-        await typewrite(p, line)
+        await typewrite(p, line, 10)
     }
 
     return
+}
+
+let errorCount = 0;
+
+function getUnknownCommandMessage(cmd) {
+  errorCount++;
+
+  let tier;
+  if (errorCount >= 6)      tier = unknownCommandMessages.max;
+  else if (errorCount >= 5) tier = unknownCommandMessages[5];
+  else if (errorCount >= 4) tier = unknownCommandMessages[4];
+  else if (errorCount >= 3) tier = unknownCommandMessages[3];
+  else if (errorCount >= 2) tier = unknownCommandMessages[2];
+  else                      tier = unknownCommandMessages[1];
+
+  const template = tier[Math.floor(Math.random() * tier.length)];
+  return template.replace(/\{cmd\}/g, cmd);
+}
+
+function resetErrorCount() {
+  errorCount = 0;
+}
+
+
+async function typeUnknown(entradaDoUsuario){
+    const p = document.createElement("p")
+    p.classList = "text-error"
+    terminal.appendChild(p)
+    await typewrite(p, getUnknownCommandMessage(entradaDoUsuario) ,10)
+    return
+}
+
+
+function clearTerminal(){
+    terminal.innerHTML = ""
 }
 
 

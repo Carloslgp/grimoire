@@ -18,12 +18,7 @@ async function createInput() {
 
             controller.abort(); 
 
-            let comandoCorreto = await verificarResposta(inputConsole)
-            if(comandoCorreto){
-                console.log("Comando executado")
-            }else{
-                console.log("Comando errado!")
-            }
+            await verificarResposta(inputConsole)
 
             
             await createInput();
@@ -33,6 +28,16 @@ async function createInput() {
         
     }, { signal: controller.signal })
 
+}
+
+
+async function logout() {
+    await fetch('/api/logout', {
+        method: "POST",
+        headers: { Authorization: `Bearer ${localStorage.getItem('grimoire_token')}` }
+    })
+    localStorage.removeItem("grimoire_token")
+    window.location.reload();
 }
 
 
@@ -46,9 +51,20 @@ async function verificarResposta(inputConsole) {
     inputConsole.remove()
     if(entradaDoUsuario.trim() === "help"){
         await typeHelp()
-        return true
-    }else{
+        resetErrorCount()
+        return
+    }else if(entradaDoUsuario.trim() === "clear"){
+        clearTerminal()
+        resetErrorCount()
+    }else if(entradaDoUsuario.trim() === "logout"){
+        const loading = showLoading("Logging out");
+        await logout()
+        loading.stop()
 
+    }else{
+        await typeUnknown(entradaDoUsuario)
+
+        return
     }
 
 

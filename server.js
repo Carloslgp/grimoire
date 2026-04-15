@@ -88,13 +88,23 @@ app.post("/api/login", async(req, res) =>{
     const token = jwt.sign(
         {id: data.id, email: data.email},
         process.env.JWT_SECRET,
-        {expiresIn: "7d"}
+        {expiresIn: "1h"}
     )
 
     res.json({token})
 
-
 })
+
+
+app.post('/api/logout', authMiddleware, async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+
+  await supabase.from('token_blacklist').insert({ token });
+
+  res.json({ message: 'logged out' });
+});
+
+
 
 
 app.get("/api/verify", authMiddleware, (req, res) => {
