@@ -278,6 +278,8 @@ async function criarInputTerminal(texto){
 
 }
 
+
+
 async function addHelpToTitle() {
     const l1 = document.createElement("h2")
     l1.classList = "text-important"

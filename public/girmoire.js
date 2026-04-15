@@ -39,6 +39,10 @@ async function createInput() {
 async function verificarResposta(inputConsole) {
     let entradaDoUsuario = inputConsole.value 
     document.getElementById("paragrafoConsole").innerText = `>${entradaDoUsuario}`
+    let span = document.createElement("span")
+    terminal.appendChild(span)
+    span.innerText = document.getElementById("paragrafoConsole").innerText
+    document.getElementById("paragrafoConsole").remove()
     inputConsole.remove()
     if(entradaDoUsuario.trim() === "help"){
         await typeHelp()
