@@ -111,6 +111,41 @@ async function removeEntry(category, name, tag){
 
 }
 
+async function listAll(){
+
+    try{
+
+        const resposta = await fetch("http://localhost:3000/api/listAll", {
+            method: "GET",
+            headers: {
+                'Authorization':  `Bearer ${localStorage.getItem("grimoire_token")}`
+            }
+        })
+
+        const dados = await resposta.json()
+
+        if(resposta.ok){
+            await logTerminal(dados.mensagem, "success");
+
+            for (const reg of dados.registries) {
+                await showRegistry(`  [${reg.category}] ${reg.name} #${reg.tag}`, );
+            }
+
+
+        }else{
+            await logTerminal(dados.mensagem || dados.error, "error");
+        }
+
+
+    }catch(error){
+
+        console.log(error)
+        typeUserHelp("Error on our side, try again later")
+
+    }
+
+}
+
 
 async function verificarResposta(inputConsole) {
     let entradaDoUsuario = inputConsole.value
@@ -138,7 +173,20 @@ async function verificarResposta(inputConsole) {
 
 
 
-    }else if(cmd === "help"){
+    }else if(cmd === "list"){
+
+        if(!sub){
+
+            await listAll()
+
+        }else if(sub && args){
+
+            /*await listCategoryTag() */
+
+        }
+
+    }
+    else if(cmd === "help"){
         if(sub) await typeUnknown(entradaDoUsuario)
         else{
             await typeHelp()

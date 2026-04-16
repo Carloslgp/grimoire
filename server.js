@@ -43,6 +43,33 @@ app.post('/api/newRegistry', authMiddleware, async (req, res) => {
     return res.status(201).json({ mensagem: "REGISTRO CONCLUIDO.", registry: data[0] })
 })
 
+app.get('/api/listAll', authMiddleware, async(req, res) => {
+    const user_id = req.userId
+
+    const {data, error} = await supabase
+    .from("registries")
+    .select("*")
+    .eq("user_id", user_id)
+    .order("created_at", {ascending: false})
+
+
+    if(error){
+        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+    }
+
+    if(data.length === 0){
+        return res.status(200).json({ mensagem: "NENHUM REGISTRO ENCONTRADO", registries: [] })
+    }
+
+    return res.status(200).json({
+        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        registries: data
+    })
+    
+
+})
+
+
 app.delete('/api/removeRegistry', authMiddleware, async (req, res) => {
     const { category, name, tag } = req.body
     const user_id = req.userId

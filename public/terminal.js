@@ -270,6 +270,13 @@ async function logTerminal(mensagem, tipo = "success") {
     await typewrite(span, `${prefixo} ${mensagem}`);
 }
 
+async function showRegistry(mensagem) {
+    const span = document.createElement("p");
+    span.classList.add("text-success");
+    terminal.appendChild(span);
+    await typewrite(span, ` ${mensagem}`);
+}
+
 
 async function criarInputTerminal(texto){
     terminal.innerHTML += `<p id="paragrafoConsole"><input class="terminal-input" id="inputConsole" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorTerminal" class="cursor"></span></p>`
