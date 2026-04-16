@@ -262,6 +262,14 @@ async function receberSenhas() {
     }
 }
 
+async function logTerminal(mensagem, tipo = "success") {
+    const span = document.createElement("p");
+    span.classList.add(tipo === "success" ? "text-success" : "text-error");
+    terminal.appendChild(span);
+    const prefixo = tipo === "success" ? ">_ SUCESSO:" : ">_ ERRO:";
+    await typewrite(span, `${prefixo} ${mensagem}`);
+}
+
 
 async function criarInputTerminal(texto){
     terminal.innerHTML += `<p id="paragrafoConsole"><input class="terminal-input" id="inputConsole" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorTerminal" class="cursor"></span></p>`
@@ -269,7 +277,6 @@ async function criarInputTerminal(texto){
     inputConsole = document.getElementById("inputConsole")
     const cursorTerminal = document.getElementById("cursorTerminal")
     inputConsole.focus()
-    console.log(inputConsole)
 
     inputConsole.addEventListener('input', () => {
         inputConsole.style.width = (inputConsole.value.length) + 'ch';
@@ -339,13 +346,13 @@ async function typeHelp() {
     const help = [
         "Available commands:",
         " ",
-        "  grimoire list  — list everything",
-        "  grimoire list --category <category>  — filter by category",
-        "  grimoire list --tag <tag> — filter by tag",
-        "  grimoire list --category <category> --tag <tag> — filter by both",
-        "  grimoire add <category> \"<name>\" [<tag>]  — add an entry",
-        "  grimoire remove <category> \"<name>\" — remove an entry",
-        "  grimoire categories — list all categories",
+        "  list  — list everything",
+        "  list <category>  — filter by category",
+        "  list <tag> filter by tag",
+        "  list <category> <tag> — filter by both",
+        "  add <category> \"<name>\" <tag>  — add an entry",
+        "  remove <category> \"<name>\" <tag> — remove an entry",
+        "  categories — list all categories",
         " ",
         "  help — show this menu",
         "  clear — clear the terminal",
@@ -356,7 +363,7 @@ async function typeHelp() {
         const p = document.createElement("p")
         p.classList = "boot-p"
         terminal.appendChild(p)
-        await typewrite(p, line, 20)
+        await typewrite(p, line)
     }
 
     return

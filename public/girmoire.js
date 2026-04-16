@@ -61,30 +61,61 @@ async function addEntry(category, name, tag) {
         const dados = await resposta.json()
 
         if(resposta.ok){
-            const sucessoSpan = document.createElement("p")
-            sucessoSpan.classList = "text-success"
-            terminal.appendChild(sucessoSpan)
-            await typewrite(sucessoSpan, `>_SUCESSO ${dados.mensagem}`)
+            await logTerminal(dados.mensagem, "success");
         }else{
-            const erroSpan = document.createElement("p")
-            terminal.appendChild(erroSpan)
-            await typewrite(erroSpan, `>_ERRO: ${dados.mensagem || dados.error}`)
+            await logTerminal(dados.mensagem || dados.error, "error");
         }
 
         return
 
 
-    }catch{
-
+    }catch (error){
+        typeUserHelp("Error on our side, try again later")
+        console.log(error)
     }
 
 
 }
 
 
+async function removeEntry(category, name, tag){
+
+    try{
+
+        const resposta = await fetch("http://localhost:3000/api/removeRegistry", {
+            method: "DELETE",
+            headers:{
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("grimoire_token")}`
+            },
+            body:JSON.stringify({
+                category: category,
+                name: name,
+                tag:tag
+            })
+        })
+
+        const dados = await resposta.json()
+        if(resposta.ok){
+            await logTerminal(dados.mensagem, "success");
+        }else{
+            await logTerminal(dados.mensagem || dados.error, "error");
+        }
+
+
+
+    }catch(error){
+        console.log(error)
+        typeUserHelp("Error on our side, try again later")
+    }
+
+}
+
+
 async function verificarResposta(inputConsole) {
     let entradaDoUsuario = inputConsole.value
-    let [cmd, sub, args, last] = entradaDoUsuario.split(/\s+/)
+    const tokens = entradaDoUsuario.match(/"[^"]+"|\S+/g) || []
+    let [cmd, sub, args, last] = tokens.map(t => t.replace(/^"|"$/g, ""))
     document.getElementById("paragrafoConsole").innerText = `>${entradaDoUsuario}`
     let span = document.createElement("span")
     terminal.appendChild(span)
@@ -120,6 +151,17 @@ async function verificarResposta(inputConsole) {
             clearTerminal()
             resetErrorCount()
         }
+    }else if(cmd === "remove"){
+        if (!sub)        await typeUserHelp("You are missing the category, name and tag")
+        else if (!args)  await typeUserHelp("You are missing the name and tag")
+        else if (!last)  await typeUserHelp("You are missing the tag")
+        else {
+            const loading = showLoading("Deleting registry");
+            await removeEntry(sub, args, last)
+            resetErrorCount()
+            loading.stop()
+        }
+
     }else if(cmd === "logout"){
         if(sub) await typeUnknown(entradaDoUsuario)
         else{
