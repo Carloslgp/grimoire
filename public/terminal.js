@@ -339,24 +339,24 @@ async function typeHelp() {
     const help = [
         "Available commands:",
         " ",
-        "  grimoire list                                    — list everything",
-        "  grimoire list --category <category>              — filter by category",
-        "  grimoire list --tag <tag>                        — filter by tag",
-        "  grimoire list --category <category> --tag <tag>  — filter by both",
-        "  grimoire add <category> \"<name>\" [<tag>]         — add an entry",
-        "  grimoire remove <category> \"<name>\"              — remove an entry",
-        "  grimoire categories                              — list all categories",
+        "  grimoire list  — list everything",
+        "  grimoire list --category <category>  — filter by category",
+        "  grimoire list --tag <tag> — filter by tag",
+        "  grimoire list --category <category> --tag <tag> — filter by both",
+        "  grimoire add <category> \"<name>\" [<tag>]  — add an entry",
+        "  grimoire remove <category> \"<name>\" — remove an entry",
+        "  grimoire categories — list all categories",
         " ",
-        "  help                                             — show this menu",
-        "  clear                                            — clear the terminal",
-        "  logout                                           — exit your grimoire",
+        "  help — show this menu",
+        "  clear — clear the terminal",
+        "  logout — exit your grimoire",
     ]
 
     for (const line of help) {
         const p = document.createElement("p")
         p.classList = "boot-p"
         terminal.appendChild(p)
-        await typewrite(p, line, 10)
+        await typewrite(p, line, 20)
     }
 
     return
@@ -389,6 +389,14 @@ async function typeUnknown(entradaDoUsuario){
     p.classList = "text-error"
     terminal.appendChild(p)
     await typewrite(p, getUnknownCommandMessage(entradaDoUsuario) ,10)
+    return
+}
+
+async function typeUserHelp(entradaDoUsuario){
+    const p = document.createElement("p")
+    p.classList = "text-error"
+    terminal.appendChild(p)
+    await typewrite(p, entradaDoUsuario ,10)
     return
 }
 

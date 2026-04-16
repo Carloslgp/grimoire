@@ -12,7 +12,7 @@ async function authMiddleware(req, res, next){
 
 
     const { data: revogado } = await supabase
-        .from("token_blacklist")
+        .from("token_backlist")
         .select("token")
         .eq("token", token)
         .single();

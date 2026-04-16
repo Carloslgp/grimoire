@@ -9,6 +9,29 @@ app.use(express.json())
 
 app.use(express.static("public"))
 
+app.post('/api/newRegistry', authMiddleware, async (req, res) => {
+    const {category, name, tag} = req.body
+    const user_id = req.userId;
+    
+    if(!category || !name || !tag){
+        return res.status(400).json({mensagem: "PREENCHA TODOS OS CAMPOS"})
+    }
+
+
+    
+    const {data, error} = await supabase
+    .from('registries')
+    .insert({ user_id, category, name, tag })
+    .select();
+
+    if(error){
+        res.status(500).json({mensagem: "ERRO INTERNO DO SERVIDOR"})
+    }
+    res.status(201).json({ mensagem: "REGISTRO CONCLUIDO."})  
+
+
+})
+
 
 app.post('/api/register', async (req, res) => {
     const {email, senha, senhaConfirm} = req.body
@@ -99,7 +122,7 @@ app.post("/api/login", async(req, res) =>{
 app.post('/api/logout', authMiddleware, async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
 
-  await supabase.from('token_blacklist').insert({ token });
+  await supabase.from('token_backlist').insert({ token });
 
   res.json({ message: 'logged out' });
 });
