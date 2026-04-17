@@ -112,7 +112,6 @@ async function removeEntry(category, name, tag){
 }
 
 async function listAll(){
-
     try{
 
         const resposta = await fetch("http://localhost:3000/api/listAll", {
@@ -131,11 +130,9 @@ async function listAll(){
                 await showRegistry(`  [${reg.category}] ${reg.name} #${reg.tag}`, );
             }
 
-
         }else{
             await logTerminal(dados.mensagem || dados.error, "error");
         }
-
 
     }catch(error){
 
@@ -143,8 +140,48 @@ async function listAll(){
         typeUserHelp("Error on our side, try again later")
 
     }
-
 }
+
+async function listCategories(){
+
+    try{
+        const resposta = await fetch("http://localhost:3000/api/listCategories", {
+
+            method:"GET",
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("grimoire_token")}`
+            }
+
+        })
+
+        const dados = await resposta.json()
+
+        if(resposta.ok){
+            await logTerminal(dados.mensagem, "success");
+
+            for (const reg of dados.registries) {
+                await showRegistry(`  [${reg.category}]` );
+            }
+
+        }else{
+            await logTerminal(dados.mensagem || dados.error, "error");
+        }
+        
+
+
+    }catch(error){
+
+        console.log(error)
+        typeUserHelp("Error on our side, try again later")
+
+
+    }
+
+
+    
+}
+
+
 
 
 async function verificarResposta(inputConsole) {
@@ -177,7 +214,10 @@ async function verificarResposta(inputConsole) {
 
         if(!sub){
 
+            const loading = showLoading("Searching all the registries");    
             await listAll()
+            loading.stop()
+            resetErrorCount()
 
         }else if(sub && args){
 
@@ -185,8 +225,13 @@ async function verificarResposta(inputConsole) {
 
         }
 
-    }
-    else if(cmd === "help"){
+    }else if(cmd === "categories"){
+
+        const loading = showLoading("Searching all the categories"); 
+        await listCategories()
+        loading.stop()
+
+    }else if(cmd === "help"){
         if(sub) await typeUnknown(entradaDoUsuario)
         else{
             await typeHelp()

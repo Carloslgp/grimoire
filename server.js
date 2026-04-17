@@ -20,7 +20,27 @@ const loginLimiter = rateLimit({
     legacyHeaders: false,
 })
 
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: { mensagem: "MUITAS TENTATIVAS DE REGISTRO. TENTE NOVAMENTE EM 1 HORA." },
+    standardHeaders: true,
+    legacyHeaders: false,
+})
+
 const DUMMY_HASH = bcrypt.hashSync("dummy_password_for_timing_attack_mitigation", 10)
+
+const LIMITES = { category: 50, name: 100, tag: 50, email: 254, senha: 72 }
+
+function validarCampos(category, name, tag) {
+    if (typeof category !== "string" || typeof name !== "string" || typeof tag !== "string") {
+        return "CAMPOS DEVEM SER TEXTO"
+    }
+    if (category.length > LIMITES.category) return `CATEGORIA EXCEDE ${LIMITES.category} CARACTERES`
+    if (name.length > LIMITES.name) return `NOME EXCEDE ${LIMITES.name} CARACTERES`
+    if (tag.length > LIMITES.tag) return `TAG EXCEDE ${LIMITES.tag} CARACTERES`
+    return null
+}
 
 app.post('/api/newRegistry', authMiddleware, async (req, res) => {
     const { category, name, tag } = req.body
@@ -28,6 +48,11 @@ app.post('/api/newRegistry', authMiddleware, async (req, res) => {
 
     if (!category || !name || !tag) {
         return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+    }
+
+    const erroValidacao = validarCampos(category, name, tag)
+    if (erroValidacao) {
+        return res.status(400).json({ mensagem: erroValidacao })
     }
 
     const { data, error } = await supabase
@@ -69,6 +94,34 @@ app.get('/api/listAll', authMiddleware, async(req, res) => {
 
 })
 
+app.get('/api/listCategories', authMiddleware, async(req, res) => {
+    const user_id = req.userId
+
+    const {data, error} = await supabase
+    .from("registries")
+    .select("category")
+    .eq("user_id", user_id)
+    .order("created_at", {ascending: false})
+
+    
+
+    if(error){
+        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+    }
+
+    const categorias = [...new Set(data.map(r => r.category))]
+
+    if(data.length === 0){
+        return res.status(200).json({ mensagem: "NENHUMA CATEGORIA ENCONTRADA", registries: [] })
+    }
+
+    return res.status(200).json({
+        mensagem: `${categorias.length} CATEGORIA${categorias.length > 1 ? "S" : ""} ENCONTRADA${categorias.length > 1 ? "S" : ""}`,
+        registries: categorias.map(c => ({ category: c }))
+    })
+
+})
+
 
 app.delete('/api/removeRegistry', authMiddleware, async (req, res) => {
     const { category, name, tag } = req.body
@@ -76,6 +129,11 @@ app.delete('/api/removeRegistry', authMiddleware, async (req, res) => {
 
     if (!category || !name || !tag) {
         return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+    }
+
+    const erroValidacao = validarCampos(category, name, tag)
+    if (erroValidacao) {
+        return res.status(400).json({ mensagem: erroValidacao })
     }
 
     const { data, error } = await supabase
@@ -104,11 +162,23 @@ app.delete('/api/removeRegistry', authMiddleware, async (req, res) => {
 })
 
 
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', registerLimiter, async (req, res) => {
     const {email, senha, senhaConfirm} = req.body
 
     if (!email || !senha || !senhaConfirm) {
         return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS." });
+    }
+
+    if (typeof email !== "string" || typeof senha !== "string" || typeof senhaConfirm !== "string") {
+        return res.status(400).json({ mensagem: "CAMPOS DEVEM SER TEXTO." });
+    }
+
+    if (email.length > LIMITES.email) {
+        return res.status(400).json({ mensagem: `EMAIL EXCEDE ${LIMITES.email} CARACTERES.` });
+    }
+
+    if (senha.length > LIMITES.senha) {
+        return res.status(400).json({ mensagem: `SENHA EXCEDE ${LIMITES.senha} CARACTERES.` });
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
@@ -150,6 +220,14 @@ app.post("/api/login", loginLimiter, async(req, res) =>{
 
     if (!email || !senha) {
         return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS." });
+    }
+
+    if (typeof email !== "string" || typeof senha !== "string") {
+        return res.status(400).json({ mensagem: "CAMPOS DEVEM SER TEXTO." });
+    }
+
+    if (email.length > LIMITES.email || senha.length > LIMITES.senha) {
+        return res.status(401).json({ mensagem: "SENHA OU EMAIL INCORRETOS" })
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
