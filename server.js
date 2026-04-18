@@ -126,6 +126,36 @@ app.get("/api/listByCategoryTag", authMiddleware, async(req, res) =>{
 
 })
 
+app.get("/api/listByCategory", authMiddleware, async(req, res) =>{
+    const category = req.query.category
+    const user_id = req.userId
+
+    if (!category) {
+        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+    }
+
+    const {data, error} = await supabase
+    .from("registries")
+    .select("*")
+    .eq("user_id", user_id)
+    .eq("category", category)
+    .order("created_at", {ascending: false})
+
+    if(error){
+        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+    }
+
+    if(data.length === 0){
+        return res.status(200).json({ mensagem: `PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO COM ${category} :(`, registries: [] })
+    }
+
+    return res.status(200).json({
+        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        registries: data
+    })
+
+})
+
 app.get('/api/listCategories', authMiddleware, async(req, res) => {
     const user_id = req.userId
 

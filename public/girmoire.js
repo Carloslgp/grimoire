@@ -222,6 +222,46 @@ async function listCategoryTag(category, tag) {
 }
 
 
+async function listByCategory(category) {
+
+    try{
+        const params = new URLSearchParams({ category })
+        const resposta = await fetch(`/api/listByCategory?${params}`, {
+
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("grimoire_token")}`
+            }
+
+        })
+
+        const dados = await resposta.json()
+
+        if(resposta.ok){
+            if(dados.registries.length === 0){
+                await logTerminal(dados.mensagem, "error");
+            }else{
+                await logTerminal(dados.mensagem, "success");
+                for (const reg of dados.registries) {
+                    await showRegistry(`  [${reg.category}] [${reg.name}] [${reg.tag}]` );
+                }
+            }
+
+        }else{
+            await logTerminal(dados.mensagem || dados.error, "error");
+        }
+
+
+    }catch(error){
+
+        console.log(error)
+        typeUserHelp("Error on our side, try again later")
+
+    }
+    
+}
+
+
 
 
 async function verificarResposta(inputConsole) {
@@ -269,7 +309,23 @@ async function verificarResposta(inputConsole) {
 
         }
 
-    }else if(cmd === "categories"){
+    }else if(cmd === "listByCategory"){
+
+        if(sub && !args){
+            const loading = showLoading(`Searching registries with ${sub} category`)
+            await listByCategory(sub)
+            loading.stop()
+            resetErrorCount()
+        }else if(!sub){
+            await typeUserHelp("You are missing the category")
+        }else{
+            await typeUserHelp("You typed too many categories")
+        }
+
+        
+
+    }
+    else if(cmd === "categories"){
 
         const loading = showLoading("Searching all the categories"); 
         await listCategories()
