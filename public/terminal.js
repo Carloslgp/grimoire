@@ -46,12 +46,25 @@ const unknownCommandMessages = {
 
 
 function attachCursorTracking(input, cursor) {
+    const measurer = document.createElement('span');
+    measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;pointer-events:none;top:-9999px;left:-9999px;';
+    document.body.appendChild(measurer);
+
     function update() {
+        const cs = window.getComputedStyle(input);
+        measurer.style.font = cs.font;
+        measurer.style.letterSpacing = cs.letterSpacing;
+
         const len = input.value.length;
-        const offset = len - input.selectionStart;
-        const emptyShift = len === 0 ? 1 : 0;
-        cursor.style.transform = `translateX(-${offset + emptyShift}ch)`;
         input.style.width = Math.max(1, len) + 'ch';
+
+        measurer.textContent = input.value.substring(0, input.selectionStart);
+        const caretPx = measurer.offsetWidth;
+
+        const inputPx = input.offsetWidth;
+        const shiftPx = inputPx - caretPx;
+
+        cursor.style.transform = `translateX(-${shiftPx}px)`;
     }
     input.addEventListener('input', update);
     input.addEventListener('beforeinput', () => setTimeout(update, 0));
