@@ -160,7 +160,7 @@ async function sign() {
 
 async function login() {
     terminal.innerHTML += `          
-        <p id="paragrafoEmail"><input class="terminal-input" id="email" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorEmail" class="cursor"></span></p>
+        <p id="paragrafoEmail"><input class="terminal-input" id="email" type="text" name="grimoire_x7q" autocomplete="new-password" data-form-type="other" inputmode="email"/><span id="cursorEmail" class="cursor"></span></p>
         <p id="paragrafoPassword" style="display: none;"><input class="terminal-input" id="password" type="password" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorPsw" class="cursor"></span></p>`
 
     document.querySelectorAll('.terminal-input').forEach(input => {

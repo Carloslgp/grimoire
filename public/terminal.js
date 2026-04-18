@@ -112,7 +112,7 @@ function waitInput(validValues = null) {
         const input = document.createElement("input");
         input.classList.add("terminal-input");
         input.type = "text";
-        input.setAttribute("autocomplete", "off");
+        input.setAttribute("autocomplete", "new-password");
         input.setAttribute("autocorrect", "off");
         input.setAttribute("autocapitalize", "off");
         input.setAttribute("spellcheck", "false");
@@ -295,7 +295,7 @@ async function showRegistry(mensagem) {
 
 
 async function criarInputTerminal(texto){
-    terminal.innerHTML += `<p id="paragrafoConsole"><input class="terminal-input" id="inputConsole" type="text" name="grimoire_x7q" autocomplete="off" data-form-type="other"/><span id="cursorTerminal" class="cursor"></span></p>`
+    terminal.innerHTML += `<p id="paragrafoConsole"><input class="terminal-input" id="inputConsole" type="text" name="grimoire_x7q" autocomplete="new-password" data-form-type="other"/><span id="cursorTerminal" class="cursor"></span></p>`
     paragrafoConsole = document.getElementById("paragrafoConsole")
     inputConsole = document.getElementById("inputConsole")
     const cursorTerminal = document.getElementById("cursorTerminal")
