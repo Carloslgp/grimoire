@@ -124,6 +124,7 @@ body {
     vertical-align: middle;
     box-shadow: var(--green-glow);
     mix-blend-mode: difference;
+    pointer-events: none;
 }
 
 @keyframes blink {

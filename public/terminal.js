@@ -49,9 +49,17 @@ function attachCursorTracking(input, cursor) {
     function update() {
         const offset = input.value.length - input.selectionStart;
         cursor.style.transform = `translateX(-${offset}ch)`;
+        input.style.width = (input.value.length || 0) + 'ch';
     }
     input.addEventListener('input', update);
+    input.addEventListener('beforeinput', () => setTimeout(update, 0));
     input.addEventListener('keyup', update);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Unidentified') {
+            setTimeout(update, 0);
+        }
+    });
+    input.addEventListener('compositionend', update);
     input.addEventListener('click', update);
     input.addEventListener('select', update);
     input.addEventListener('focus', update);
