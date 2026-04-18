@@ -62,9 +62,13 @@ function attachCursorTracking(input, cursor) {
         }
     });
     input.addEventListener('compositionend', update);
-    input.addEventListener('click', update);
+    input.addEventListener('click', () => setTimeout(update, 0));
+    input.addEventListener('touchend', () => setTimeout(update, 0));
     input.addEventListener('select', update);
     input.addEventListener('focus', update);
+    document.addEventListener('selectionchange', () => {
+        if (document.activeElement === input) update();
+    });
     update();
 }
 

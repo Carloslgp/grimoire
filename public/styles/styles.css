@@ -118,10 +118,10 @@ body {
 .cursor {
     display: inline-block;
     width: 1ch;
-    height: 18px;
+    height: 1em;
     background: var(--green);
     animation: blink 1s step-end infinite;
-    vertical-align: middle;
+    vertical-align: baseline;
     box-shadow: var(--green-glow);
     mix-blend-mode: difference;
     pointer-events: none;
