@@ -262,6 +262,45 @@ async function listByCategory(category) {
 }
 
 
+async function listByTag(tag) {
+
+    try{
+        const params = new URLSearchParams({ tag })
+        const resposta = await fetch(`/api/listByTag?${params}`, {
+
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("grimoire_token")}`
+            }
+
+        })
+
+        const dados = await resposta.json()
+
+        if(resposta.ok){
+            if(dados.registries.length === 0){
+                await logTerminal(dados.mensagem, "error");
+            }else{
+                await logTerminal(dados.mensagem, "success");
+                for (const reg of dados.registries) {
+                    await showRegistry(`  [${reg.category}] [${reg.name}] [${reg.tag}]` );
+                }
+            }
+
+        }else{
+            await logTerminal(dados.mensagem || dados.error, "error");
+        }
+
+
+    }catch(error){
+
+        console.log(error)
+        typeUserHelp("Error on our side, try again later")
+
+    }
+    
+}
+
 
 
 async function verificarResposta(inputConsole) {
@@ -299,13 +338,17 @@ async function verificarResposta(inputConsole) {
             loading.stop()
             resetErrorCount()
 
-        }else if(sub && args){
+        }else if(sub && args && !last){
 
             const loading = showLoading("Searching all the registries");   
             await listCategoryTag(sub, args)
             loading.stop()
             resetErrorCount()
 
+
+        }else{
+
+            typeUserHelp("the grimoire couldn't understand, too many words at once. try simplifying your command. ")
 
         }
 
@@ -324,9 +367,22 @@ async function verificarResposta(inputConsole) {
 
         
 
+    }else if(cmd === "listByTag"){
+
+        if(sub && !args){
+            const loading = showLoading(`Searching registries with ${sub} tag`)
+            await listByTag(sub)
+            loading.stop()
+            resetErrorCount()
+        }else if(!sub){
+            await typeUserHelp("You are missing the tag")
+        }else{
+            await typeUserHelp("You typed too many tags")
+        }    
+
     }
     else if(cmd === "categories"){
-
+        
         const loading = showLoading("Searching all the categories"); 
         await listCategories()
         loading.stop()
