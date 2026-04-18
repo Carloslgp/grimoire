@@ -127,7 +127,7 @@ async function listAll(){
             }else{
                 await logTerminal(dados.mensagem, "success");
                 for (const reg of dados.registries) {
-                    await showRegistry(`  [${reg.category}] ${reg.name} #${reg.tag}`, );
+                    await showRegistry(`  [${reg.category}] [${reg.name}] [${reg.tag}]`, );
                 }
             }
 

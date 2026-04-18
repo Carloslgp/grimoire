@@ -7,6 +7,7 @@ const rateLimit = require("express-rate-limit");
 const authMiddleware = require("./middlewares/authMiddleware")
 
 const app = express()
+app.set('trust proxy', 1)
 app.use(helmet())
 app.use(express.json())
 
@@ -377,7 +378,8 @@ app.get("/api/verify", authMiddleware, (req, res) => {
 
 
 
-app.listen(3000, () => console.log('http://localhost:3000'))
+const PORT = process.env.PORT || 3000
+app.listen(PORT, '0.0.0.0', () => console.log(`http://localhost:${PORT}`))
 
 
 

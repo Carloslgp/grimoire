@@ -116,7 +116,7 @@ async function sign() {
         user.unshift(emailValido)
         const loading = showLoading("Creating new grimoire");
         try{
-            const resposta = await fetch("http://localhost:3000/api/register", {
+            const resposta = await fetch("/api/register", {
                 method: "POST",
                 headers: {
                     'Content-Type':"application/json"
@@ -247,7 +247,7 @@ async function login() {
     }
     const loading = showLoading("Logging in");
     try {
-        const resposta = await fetch("http://localhost:3000/api/login", {
+        const resposta = await fetch("/api/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -315,7 +315,7 @@ async function checkSession() {
     try{
 
         const loading = showLoading("Checking Token");
-        const response = await fetch("http://localhost:3000/api/verify", {
+        const response = await fetch("/api/verify", {
             headers: {"Authorization": `Bearer ${savedToken}`}
         })
         loading.stop()
