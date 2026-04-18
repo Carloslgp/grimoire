@@ -47,9 +47,11 @@ const unknownCommandMessages = {
 
 function attachCursorTracking(input, cursor) {
     function update() {
-        const offset = input.value.length - input.selectionStart;
-        cursor.style.transform = `translateX(-${offset}ch)`;
-        input.style.width = (input.value.length || 0) + 'ch';
+        const len = input.value.length;
+        const offset = len - input.selectionStart;
+        const emptyShift = len === 0 ? 1 : 0;
+        cursor.style.transform = `translateX(-${offset + emptyShift}ch)`;
+        input.style.width = Math.max(1, len) + 'ch';
     }
     input.addEventListener('input', update);
     input.addEventListener('beforeinput', () => setTimeout(update, 0));
