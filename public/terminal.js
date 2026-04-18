@@ -62,13 +62,24 @@ function attachCursorTracking(input, cursor) {
         }
     });
     input.addEventListener('compositionend', update);
-    input.addEventListener('click', () => setTimeout(update, 0));
-    input.addEventListener('touchend', () => setTimeout(update, 0));
     input.addEventListener('select', update);
     input.addEventListener('focus', update);
-    document.addEventListener('selectionchange', () => {
-        if (document.activeElement === input) update();
+
+    let lastSel = -1;
+    function poll() {
+        if (document.activeElement !== input) return;
+        if (input.selectionStart !== lastSel) {
+            lastSel = input.selectionStart;
+            update();
+        }
+        requestAnimationFrame(poll);
+    }
+    input.addEventListener('focus', () => {
+        lastSel = -1;
+        requestAnimationFrame(poll);
     });
+    if (document.activeElement === input) requestAnimationFrame(poll);
+
     update();
 }
 
