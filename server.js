@@ -83,7 +83,7 @@ app.get('/api/listAll', authMiddleware, async(req, res) => {
     }
 
     if(data.length === 0){
-        return res.status(200).json({ mensagem: "NENHUM REGISTRO ENCONTRADO", registries: [] })
+        return res.status(200).json({ mensagem: "PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO :(", registries: [] })
     }
 
     return res.status(200).json({
@@ -91,6 +91,38 @@ app.get('/api/listAll', authMiddleware, async(req, res) => {
         registries: data
     })
     
+
+})
+
+app.get("/api/listByCategoryTag", authMiddleware, async(req, res) =>{
+    const category = req.query.category
+    const tag = req.query.tag
+    const user_id = req.userId
+
+    if (!category || !tag) {
+        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+    }
+
+    const {data, error} = await supabase
+    .from("registries")
+    .select("*")
+    .eq("user_id", user_id)
+    .eq("category", category)
+    .eq("tag", tag)
+    .order("created_at", {ascending: false})
+
+    if(error){
+        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+    }
+
+    if(data.length === 0){
+        return res.status(200).json({ mensagem: `PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO COM ${category} E ${tag} :(`, registries: [] })
+    }
+
+    return res.status(200).json({
+        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        registries: data
+    })
 
 })
 

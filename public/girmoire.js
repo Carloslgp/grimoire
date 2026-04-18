@@ -2,8 +2,6 @@ async function system(){
 
     addHelpToTitle()
 
-    temrinal = ""
-
     createInput()
 
 
@@ -45,7 +43,7 @@ async function addEntry(category, name, tag) {
 
 
     try{
-        const resposta = await fetch("http://localhost:3000/api/newRegistry", {
+        const resposta = await fetch("/api/newRegistry", {
             method: "POST",
             headers:{
                 'Content-Type': "application/json",
@@ -82,7 +80,7 @@ async function removeEntry(category, name, tag){
 
     try{
 
-        const resposta = await fetch("http://localhost:3000/api/removeRegistry", {
+        const resposta = await fetch("/api/removeRegistry", {
             method: "DELETE",
             headers:{
                 "Content-Type": "application/json",
@@ -114,7 +112,7 @@ async function removeEntry(category, name, tag){
 async function listAll(){
     try{
 
-        const resposta = await fetch("http://localhost:3000/api/listAll", {
+        const resposta = await fetch("/api/listAll", {
             method: "GET",
             headers: {
                 'Authorization':  `Bearer ${localStorage.getItem("grimoire_token")}`
@@ -124,10 +122,13 @@ async function listAll(){
         const dados = await resposta.json()
 
         if(resposta.ok){
-            await logTerminal(dados.mensagem, "success");
-
-            for (const reg of dados.registries) {
-                await showRegistry(`  [${reg.category}] ${reg.name} #${reg.tag}`, );
+            if(dados.registries.length === 0){
+                await logTerminal(dados.mensagem, "error");
+            }else{
+                await logTerminal(dados.mensagem, "success");
+                for (const reg of dados.registries) {
+                    await showRegistry(`  [${reg.category}] ${reg.name} #${reg.tag}`, );
+                }
             }
 
         }else{
@@ -145,7 +146,7 @@ async function listAll(){
 async function listCategories(){
 
     try{
-        const resposta = await fetch("http://localhost:3000/api/listCategories", {
+        const resposta = await fetch("/api/listCategories", {
 
             method:"GET",
             headers: {
@@ -178,6 +179,45 @@ async function listCategories(){
     }
 
 
+    
+}
+
+async function listCategoryTag(category, tag) {
+
+    try{
+        const params = new URLSearchParams({ category, tag })
+        const resposta = await fetch(`/api/listByCategoryTag?${params}`, {
+
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("grimoire_token")}`
+            }
+
+        })
+
+        const dados = await resposta.json()
+
+        if(resposta.ok){
+            if(dados.registries.length === 0){
+                await logTerminal(dados.mensagem, "error");
+            }else{
+                await logTerminal(dados.mensagem, "success");
+                for (const reg of dados.registries) {
+                    await showRegistry(`  [${reg.category}] [${reg.name}] [${reg.tag}]` );
+                }
+            }
+
+        }else{
+            await logTerminal(dados.mensagem || dados.error, "error");
+        }
+
+
+    }catch(error){
+
+        console.log(error)
+        typeUserHelp("Error on our side, try again later")
+
+    }
     
 }
 
@@ -221,7 +261,11 @@ async function verificarResposta(inputConsole) {
 
         }else if(sub && args){
 
-            /*await listCategoryTag() */
+            const loading = showLoading("Searching all the registries");   
+            await listCategoryTag(sub, args)
+            loading.stop()
+            resetErrorCount()
+
 
         }
 
