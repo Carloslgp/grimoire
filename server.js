@@ -29,6 +29,14 @@ const registerLimiter = rateLimit({
     legacyHeaders: false,
 })
 
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    message: { mensagem: "MUITAS REQUISIÇÕES. AGUARDE UM MOMENTO." },
+    standardHeaders: true,
+    legacyHeaders: false,
+})
+
 const DUMMY_HASH = bcrypt.hashSync("dummy_password_for_timing_attack_mitigation", 10)
 
 const LIMITES = { category: 50, name: 100, tag: 50, email: 254, senha: 72 }
@@ -43,7 +51,7 @@ function validarCampos(category, name, tag) {
     return null
 }
 
-app.post('/api/newRegistry', authMiddleware, async (req, res) => {
+app.post('/api/newRegistry', apiLimiter, authMiddleware, async (req, res) => {
     const { category, name, tag } = req.body
     const user_id = req.userId
 
@@ -69,7 +77,7 @@ app.post('/api/newRegistry', authMiddleware, async (req, res) => {
     return res.status(201).json({ mensagem: "REGISTRO CONCLUIDO.", registry: data[0] })
 })
 
-app.get('/api/listAll', authMiddleware, async(req, res) => {
+app.get('/api/listAll', apiLimiter, authMiddleware, async(req, res) => {
     const user_id = req.userId
 
     const {data, error} = await supabase
@@ -95,7 +103,7 @@ app.get('/api/listAll', authMiddleware, async(req, res) => {
 
 })
 
-app.get("/api/listByCategoryTag", authMiddleware, async(req, res) =>{
+app.get("/api/listByCategoryTag", apiLimiter, authMiddleware, async(req, res) =>{
     const category = req.query.category
     const tag = req.query.tag
     const user_id = req.userId
@@ -127,7 +135,7 @@ app.get("/api/listByCategoryTag", authMiddleware, async(req, res) =>{
 
 })
 
-app.get("/api/listByCategory", authMiddleware, async(req, res) =>{
+app.get("/api/listByCategory", apiLimiter, authMiddleware, async(req, res) =>{
     const category = req.query.category
     const user_id = req.userId
 
@@ -158,7 +166,7 @@ app.get("/api/listByCategory", authMiddleware, async(req, res) =>{
 })
 
 
-app.get("/api/listByTag", authMiddleware, async(req, res) =>{
+app.get("/api/listByTag", apiLimiter, authMiddleware, async(req, res) =>{
     const tag = req.query.tag
     const user_id = req.userId
 
@@ -188,7 +196,7 @@ app.get("/api/listByTag", authMiddleware, async(req, res) =>{
 
 })
 
-app.get('/api/listCategories', authMiddleware, async(req, res) => {
+app.get('/api/listCategories', apiLimiter, authMiddleware, async(req, res) => {
     const user_id = req.userId
 
     const {data, error} = await supabase
@@ -217,7 +225,7 @@ app.get('/api/listCategories', authMiddleware, async(req, res) => {
 })
 
 
-app.delete('/api/removeRegistry', authMiddleware, async (req, res) => {
+app.delete('/api/removeRegistry', apiLimiter, authMiddleware, async (req, res) => {
     const { category, name, tag } = req.body
     const user_id = req.userId
 
@@ -337,7 +345,7 @@ app.post("/api/login", loginLimiter, async(req, res) =>{
 
     const {data, error} = await supabase
         .from("users")
-        .select("*")
+        .select("id, email, senha_hash")
         .eq("email", email)
         .single();
 
@@ -359,10 +367,13 @@ app.post("/api/login", loginLimiter, async(req, res) =>{
 })
 
 
-app.post('/api/logout', authMiddleware, async (req, res) => {
+app.post('/api/logout', apiLimiter, authMiddleware, async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
 
   await supabase.from('token_backlist').insert({ token });
+
+  const umaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  await supabase.from('token_backlist').delete().lt('invalidated_at', umaHoraAtras);
 
   res.json({ message: 'logged out' });
 });
@@ -370,7 +381,7 @@ app.post('/api/logout', authMiddleware, async (req, res) => {
 
 
 
-app.get("/api/verify", authMiddleware, (req, res) => {
+app.get("/api/verify", apiLimiter, authMiddleware, (req, res) => {
     res.json({ mensagem: "TOKEN VÁLIDO.", userId: req.userId, email: req.userEmail });
 });
 

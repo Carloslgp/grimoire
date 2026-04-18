@@ -69,7 +69,6 @@ async function addEntry(category, name, tag) {
 
     }catch (error){
         typeUserHelp("Error on our side, try again later")
-        console.log(error)
     }
 
 
@@ -103,7 +102,6 @@ async function removeEntry(category, name, tag){
 
 
     }catch(error){
-        console.log(error)
         typeUserHelp("Error on our side, try again later")
     }
 
@@ -137,7 +135,6 @@ async function listAll(){
 
     }catch(error){
 
-        console.log(error)
         typeUserHelp("Error on our side, try again later")
 
     }
@@ -172,7 +169,6 @@ async function listCategories(){
 
     }catch(error){
 
-        console.log(error)
         typeUserHelp("Error on our side, try again later")
 
 
@@ -214,7 +210,6 @@ async function listCategoryTag(category, tag) {
 
     }catch(error){
 
-        console.log(error)
         typeUserHelp("Error on our side, try again later")
 
     }
@@ -254,7 +249,6 @@ async function listByCategory(category) {
 
     }catch(error){
 
-        console.log(error)
         typeUserHelp("Error on our side, try again later")
 
     }
@@ -294,7 +288,6 @@ async function listByTag(tag) {
 
     }catch(error){
 
-        console.log(error)
         typeUserHelp("Error on our side, try again later")
 
     }

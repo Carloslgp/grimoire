@@ -43,7 +43,6 @@ async function sign() {
             terminal.innerHTML = ""
             return await sign()
         } else {
-            console.log("logou!")
             terminal.innerHTML = ""
             return true
         }
@@ -112,7 +111,6 @@ async function sign() {
 
         } while (user.length == 0)
 
-        console.log("sai do loop")
         user.unshift(emailValido)
         const loading = showLoading("Creating new grimoire");
         try{
@@ -141,7 +139,6 @@ async function sign() {
                 return await sign();
             }
 
-            console.log("Registrado!", dados);
             terminal.textContent = "";
             return await sign();
 
@@ -340,7 +337,6 @@ async function checkSession() {
 
 
     }catch(error){
-        console.log(error)
         // Erro de rede — token pode ser válido, não deletar
         await boot();
         if(await sign()){
