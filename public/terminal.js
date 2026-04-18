@@ -103,6 +103,14 @@ function waitInput(validValues = null) {
 
         const input = document.createElement("input");
         input.classList.add("terminal-input");
+        input.type = "text";
+        input.setAttribute("autocomplete", "off");
+        input.setAttribute("autocorrect", "off");
+        input.setAttribute("autocapitalize", "off");
+        input.setAttribute("spellcheck", "false");
+        input.setAttribute("inputmode", "numeric");
+        input.setAttribute("name", "grimoire_x7q");
+        input.setAttribute("data-form-type", "other");
         input.style.width = "0px";
         p.appendChild(input);
 
