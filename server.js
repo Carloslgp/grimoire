@@ -16,7 +16,7 @@ app.use(express.static("public"))
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
-    message: { mensagem: "MUITAS TENTATIVAS. TENTE NOVAMENTE EM 15 MINUTOS." },
+    message: { mensagem: "TOO MANY ATTEMPTS. TRY AGAIN IN 15 MINUTES." },
     standardHeaders: true,
     legacyHeaders: false,
 })
@@ -24,7 +24,7 @@ const loginLimiter = rateLimit({
 const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 3,
-    message: { mensagem: "MUITAS TENTATIVAS DE REGISTRO. TENTE NOVAMENTE EM 1 HORA." },
+    message: { mensagem: "TOO MANY REGISTRATION ATTEMPTS. TRY AGAIN IN 1 HOUR." },
     standardHeaders: true,
     legacyHeaders: false,
 })
@@ -32,7 +32,7 @@ const registerLimiter = rateLimit({
 const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
     max: 60,
-    message: { mensagem: "MUITAS REQUISIÇÕES. AGUARDE UM MOMENTO." },
+    message: { mensagem: "TOO MANY REQUESTS. WAIT A MOMENT." },
     standardHeaders: true,
     legacyHeaders: false,
 })
@@ -43,11 +43,11 @@ const LIMITES = { category: 50, name: 100, tag: 50, email: 254, senha: 72 }
 
 function validarCampos(category, name, tag) {
     if (typeof category !== "string" || typeof name !== "string" || typeof tag !== "string") {
-        return "CAMPOS DEVEM SER TEXTO"
+        return "FIELDS MUST BE TEXT"
     }
-    if (category.length > LIMITES.category) return `CATEGORIA EXCEDE ${LIMITES.category} CARACTERES`
-    if (name.length > LIMITES.name) return `NOME EXCEDE ${LIMITES.name} CARACTERES`
-    if (tag.length > LIMITES.tag) return `TAG EXCEDE ${LIMITES.tag} CARACTERES`
+    if (category.length > LIMITES.category) return `CATEGORY EXCEEDS ${LIMITES.category} CHARACTERS`
+    if (name.length > LIMITES.name) return `NAME EXCEEDS ${LIMITES.name} CHARACTERS`
+    if (tag.length > LIMITES.tag) return `TAG EXCEEDS ${LIMITES.tag} CHARACTERS`
     return null
 }
 
@@ -56,7 +56,7 @@ app.post('/api/newRegistry', apiLimiter, authMiddleware, async (req, res) => {
     const user_id = req.userId
 
     if (!category || !name || !tag) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS" })
     }
 
     const erroValidacao = validarCampos(category, name, tag)
@@ -71,10 +71,10 @@ app.post('/api/newRegistry', apiLimiter, authMiddleware, async (req, res) => {
 
     if (error) {
         console.error("Supabase insert error:", error)
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
-    return res.status(201).json({ mensagem: "REGISTRO CONCLUIDO.", registry: data[0] })
+    return res.status(201).json({ mensagem: "REGISTRY COMPLETED.", registry: data[0] })
 })
 
 app.get('/api/listAll', apiLimiter, authMiddleware, async(req, res) => {
@@ -88,18 +88,18 @@ app.get('/api/listAll', apiLimiter, authMiddleware, async(req, res) => {
 
 
     if(error){
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
     if(data.length === 0){
-        return res.status(200).json({ mensagem: "PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO :(", registries: [] })
+        return res.status(200).json({ mensagem: "LOOKS LIKE YOU HAVE NO REGISTRIES :(", registries: [] })
     }
 
     return res.status(200).json({
-        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        mensagem: `${data.length} REGISTR${data.length > 1 ? "IES" : "Y"} FOUND`,
         registries: data
     })
-    
+
 
 })
 
@@ -109,7 +109,7 @@ app.get("/api/listByCategoryTag", apiLimiter, authMiddleware, async(req, res) =>
     const user_id = req.userId
 
     if (!category || !tag) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS" })
     }
 
     const {data, error} = await supabase
@@ -121,15 +121,15 @@ app.get("/api/listByCategoryTag", apiLimiter, authMiddleware, async(req, res) =>
     .order("created_at", {ascending: false})
 
     if(error){
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
     if(data.length === 0){
-        return res.status(200).json({ mensagem: `PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO COM ${category} E ${tag} :(`, registries: [] })
+        return res.status(200).json({ mensagem: `LOOKS LIKE YOU HAVE NO REGISTRIES WITH ${category} AND ${tag} :(`, registries: [] })
     }
 
     return res.status(200).json({
-        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        mensagem: `${data.length} REGISTR${data.length > 1 ? "IES" : "Y"} FOUND`,
         registries: data
     })
 
@@ -140,7 +140,7 @@ app.get("/api/listByCategory", apiLimiter, authMiddleware, async(req, res) =>{
     const user_id = req.userId
 
     if (!category) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS" })
     }
 
     const {data, error} = await supabase
@@ -151,15 +151,15 @@ app.get("/api/listByCategory", apiLimiter, authMiddleware, async(req, res) =>{
     .order("created_at", {ascending: false})
 
     if(error){
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
     if(data.length === 0){
-        return res.status(200).json({ mensagem: `PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO COM ${category} :(`, registries: [] })
+        return res.status(200).json({ mensagem: `LOOKS LIKE YOU HAVE NO REGISTRIES WITH ${category} :(`, registries: [] })
     }
 
     return res.status(200).json({
-        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        mensagem: `${data.length} REGISTR${data.length > 1 ? "IES" : "Y"} FOUND`,
         registries: data
     })
 
@@ -171,7 +171,7 @@ app.get("/api/listByTag", apiLimiter, authMiddleware, async(req, res) =>{
     const user_id = req.userId
 
     if (!tag) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS" })
     }
 
     const {data, error} = await supabase
@@ -182,15 +182,15 @@ app.get("/api/listByTag", apiLimiter, authMiddleware, async(req, res) =>{
     .order("created_at", {ascending: false})
 
     if(error){
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
     if(data.length === 0){
-        return res.status(200).json({ mensagem: `PARECE QUE VOCÊ NÃO TEM NENHUM REGISTRO COM ${tag} :(`, registries: [] })
+        return res.status(200).json({ mensagem: `LOOKS LIKE YOU HAVE NO REGISTRIES WITH ${tag} :(`, registries: [] })
     }
 
     return res.status(200).json({
-        mensagem: `${data.length} REGISTRO${data.length > 1 ? "S" : ""} ENCONTRADO${data.length > 1 ? "S" : ""}`,
+        mensagem: `${data.length} REGISTR${data.length > 1 ? "IES" : "Y"} FOUND`,
         registries: data
     })
 
@@ -208,17 +208,17 @@ app.get('/api/listCategories', apiLimiter, authMiddleware, async(req, res) => {
     
 
     if(error){
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
     const categorias = [...new Set(data.map(r => r.category))]
 
     if(data.length === 0){
-        return res.status(200).json({ mensagem: "NENHUMA CATEGORIA ENCONTRADA", registries: [] })
+        return res.status(200).json({ mensagem: "NO CATEGORIES FOUND", registries: [] })
     }
 
     return res.status(200).json({
-        mensagem: `${categorias.length} CATEGORIA${categorias.length > 1 ? "S" : ""} ENCONTRADA${categorias.length > 1 ? "S" : ""}`,
+        mensagem: `${categorias.length} CATEGOR${categorias.length > 1 ? "IES" : "Y"} FOUND`,
         registries: categorias.map(c => ({ category: c }))
     })
 
@@ -230,7 +230,7 @@ app.delete('/api/removeRegistry', apiLimiter, authMiddleware, async (req, res) =
     const user_id = req.userId
 
     if (!category || !name || !tag) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS" })
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS" })
     }
 
     const erroValidacao = validarCampos(category, name, tag)
@@ -249,16 +249,16 @@ app.delete('/api/removeRegistry', apiLimiter, authMiddleware, async (req, res) =
 
     if (error) {
         console.error("Supabase delete error:", error)
-        return res.status(500).json({ mensagem: "ERRO INTERNO NO SERVIDOR" })
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR" })
     }
 
     if (data.length === 0) {
-        return res.status(404).json({ mensagem: "REGISTRO NÃO ENCONTRADO" })
+        return res.status(404).json({ mensagem: "REGISTRY NOT FOUND" })
     }
 
     const mensagem = data.length === 1
-        ? "REGISTRO DELETADO"
-        : `${data.length} REGISTROS DELETADOS`;
+        ? "REGISTRY DELETED"
+        : `${data.length} REGISTRIES DELETED`;
 
     return res.status(200).json({ mensagem, deleted: data.length })
 })
@@ -268,33 +268,33 @@ app.post('/api/register', registerLimiter, async (req, res) => {
     const {email, senha, senhaConfirm} = req.body
 
     if (!email || !senha || !senhaConfirm) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS." });
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS." });
     }
 
     if (typeof email !== "string" || typeof senha !== "string" || typeof senhaConfirm !== "string") {
-        return res.status(400).json({ mensagem: "CAMPOS DEVEM SER TEXTO." });
+        return res.status(400).json({ mensagem: "FIELDS MUST BE TEXT." });
     }
 
     if (email.length > LIMITES.email) {
-        return res.status(400).json({ mensagem: `EMAIL EXCEDE ${LIMITES.email} CARACTERES.` });
+        return res.status(400).json({ mensagem: `EMAIL EXCEEDS ${LIMITES.email} CHARACTERS.` });
     }
 
     if (senha.length > LIMITES.senha) {
-        return res.status(400).json({ mensagem: `SENHA EXCEDE ${LIMITES.senha} CARACTERES.` });
+        return res.status(400).json({ mensagem: `PASSWORD EXCEEDS ${LIMITES.senha} CHARACTERS.` });
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
 
     if (!emailRegex.test(email)) {
-        return res.status(400).json({ mensagem: "EMAIL INVÁLIDO." });
+        return res.status(400).json({ mensagem: "INVALID EMAIL." });
     }
 
     if (senha !== senhaConfirm) {
-        return res.status(400).json({ mensagem: "AS SENHAS NÃO COINCIDEM." });
+        return res.status(400).json({ mensagem: "PASSWORDS DO NOT MATCH." });
     }
 
     if (senha.length < 8) {
-        return res.status(400).json({ mensagem: "SENHA DEVE TER NO MÍNIMO 8 CARACTERES." });
+        return res.status(400).json({ mensagem: "PASSWORD MUST BE AT LEAST 8 CHARACTERS." });
     }
 
     const senhaHash = await bcrypt.hash(senha, 10);
@@ -307,13 +307,13 @@ app.post('/api/register', registerLimiter, async (req, res) => {
     if (error) {
         // Código 23505 = violação de UNIQUE (email já existe)
         if (error.code === '23505') {
-        return res.status(409).json({ mensagem: "EMAIL JÁ CADASTRADO." });
+        return res.status(409).json({ mensagem: "EMAIL ALREADY REGISTERED." });
         }
         console.error(error);
-        return res.status(500).json({ mensagem: "ERRO INTERNO DO SERVIDOR." });
+        return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR." });
     }
 
-    res.status(201).json({ mensagem: "USUÁRIO REGISTRADO.", userId: data[0].id });
+    res.status(201).json({ mensagem: "USER REGISTERED.", userId: data[0].id });
 
 })
 
@@ -321,25 +321,25 @@ app.post("/api/login", loginLimiter, async(req, res) =>{
     const {email, senha} = req.body
 
     if (!email || !senha) {
-        return res.status(400).json({ mensagem: "PREENCHA TODOS OS CAMPOS." });
+        return res.status(400).json({ mensagem: "FILL OUT ALL FIELDS." });
     }
 
     if (typeof email !== "string" || typeof senha !== "string") {
-        return res.status(400).json({ mensagem: "CAMPOS DEVEM SER TEXTO." });
+        return res.status(400).json({ mensagem: "FIELDS MUST BE TEXT." });
     }
 
     if (email.length > LIMITES.email || senha.length > LIMITES.senha) {
-        return res.status(401).json({ mensagem: "SENHA OU EMAIL INCORRETOS" })
+        return res.status(401).json({ mensagem: "INCORRECT EMAIL OR PASSWORD" })
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
 
     if (!emailRegex.test(email)) {
-        return res.status(400).json({ mensagem: "EMAIL INVÁLIDO." });
+        return res.status(400).json({ mensagem: "INVALID EMAIL." });
     }
 
     if(senha.length < 8){
-        return res.status(400).json({mensagem: "SENHA DEVE TER NO MÍNIMO 8 CARACTERES."})
+        return res.status(400).json({mensagem: "PASSWORD MUST BE AT LEAST 8 CHARACTERS."})
     }
 
 
@@ -353,7 +353,7 @@ app.post("/api/login", loginLimiter, async(req, res) =>{
     const senhaValida = await bcrypt.compare(senha, hashParaComparar)
 
     if(error || !data || !senhaValida){
-        return res.status(401).json({mensagem: "SENHA OU EMAIL INCORRETOS"})
+        return res.status(401).json({mensagem: "INCORRECT EMAIL OR PASSWORD"})
     }
 
     const token = jwt.sign(
@@ -382,7 +382,7 @@ app.post('/api/logout', apiLimiter, authMiddleware, async (req, res) => {
 
 
 app.get("/api/verify", apiLimiter, authMiddleware, (req, res) => {
-    res.json({ mensagem: "TOKEN VÁLIDO.", userId: req.userId, email: req.userEmail });
+    res.json({ mensagem: "TOKEN VALID.", userId: req.userId, email: req.userEmail });
 });
 
 
