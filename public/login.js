@@ -131,7 +131,7 @@ async function sign() {
             if(!resposta.ok){
                 const erroSpan = document.createElement("span")
                 terminal.appendChild(erroSpan)
-                await typewrite(erroSpan, `>_ERRO ${dados.mensagem}`)
+                await typewrite(erroSpan, `>_ERROR ${dados.mensagem}`)
 
                 await new Promise(r => setTimeout(r, 2000));
 
@@ -146,7 +146,7 @@ async function sign() {
             loading.stop();
             const erroSpan = document.createElement("span");
             terminal.appendChild(erroSpan);
-            await typewrite(erroSpan, ">_ ERRO DE CONEXÃO. TENTE NOVAMENTE.");
+            await typewrite(erroSpan, ">_ CONNECTION ERROR. TRY AGAIN.");
             
             await new Promise(r => setTimeout(r, 2000));
             terminal.textContent = "";
@@ -259,7 +259,7 @@ async function login() {
             const errorMsg = document.createElement("p");
             errorMsg.classList.add("text-error");
             terminal.appendChild(errorMsg);
-            await typewrite(errorMsg, `>_ ERRO: ${dados.mensagem}`);
+            await typewrite(errorMsg, `>_ ERROR: ${dados.mensagem}`);
             await new Promise(r => setTimeout(r, 2000));
             terminal.innerHTML = "";
             return false;
@@ -273,7 +273,7 @@ async function login() {
         loading.stop();
         const erroSpan = document.createElement("span");
         terminal.appendChild(erroSpan);
-        await typewrite(erroSpan, ">_ ERRO DE CONEXÃO. TENTE NOVAMENTE.");
+        await typewrite(erroSpan, ">_ CONNECTION ERROR. TRY AGAIN.");
         await new Promise(r => setTimeout(r, 2000));
         terminal.innerHTML = "";
         return false;

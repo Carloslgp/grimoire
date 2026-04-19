@@ -299,21 +299,19 @@ app.post('/api/register', registerLimiter, async (req, res) => {
 
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from('users')
         .insert({ email: email, senha_hash: senhaHash })
         .select();
 
-    if (error) {
-        // Código 23505 = violação de UNIQUE (email já existe)
-        if (error.code === '23505') {
-        return res.status(409).json({ mensagem: "EMAIL ALREADY REGISTERED." });
-        }
+    // Swallow UNIQUE violation (code 23505) to prevent user enumeration —
+    // a duplicate email returns the same response as a fresh registration.
+    if (error && error.code !== '23505') {
         console.error(error);
         return res.status(500).json({ mensagem: "INTERNAL SERVER ERROR." });
     }
 
-    res.status(201).json({ mensagem: "USER REGISTERED.", userId: data[0].id });
+    res.status(201).json({ mensagem: "USER REGISTERED." });
 
 })
 

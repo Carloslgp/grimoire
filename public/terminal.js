@@ -312,7 +312,7 @@ async function logTerminal(mensagem, tipo = "success") {
     const span = document.createElement("p");
     span.classList.add(tipo === "success" ? "text-success" : "text-error");
     terminal.appendChild(span);
-    const prefixo = tipo === "success" ? ">_ SUCESSO:" : ">_ ERRO:";
+    const prefixo = tipo === "success" ? ">_ SUCCESS:" : ">_ ERROR:";
     await typewrite(span, `${prefixo} ${mensagem}`);
 }
 
