@@ -58,7 +58,7 @@ Grimoire notices when you make mistakes. Type something it doesn't understand, a
 
 ### An escape hatch everywhere
 
-In the middle of any flow, at any prompt, typing `/quit` takes you back to the start. Grimoire never traps you inside a form you can't exit.
+At any prompt, in the middle of any flow, typing /quit takes you back to the start. (It's only used in sign-in and sign-up for now, maybe one day we'll add forms in the system itself.) Grimoire never traps you in a form you can't exit.
 
 ## The commands
 
