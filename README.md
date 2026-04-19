@@ -1,6 +1,8 @@
 # Grimoire
 
-**Track everything your way, no bureaucracy.**
+**Track everything your way, no bureaucracy. Different by design.**
+
+Built as a real-world project to learn Node.js. No tutorials, just building.
 
 ![Grimoire init](docs/grimoire-init.gif)
 
@@ -9,6 +11,8 @@ Grimoire is a place to save the things you don't want to forget. Books you've re
 There are no buttons, no forms, no menus, no drop-downs, no "Are you sure?" pop-ups. You type, the grimoire answers. That's it.
 
 > **Live demo:** https://grimoire-hcj5.onrender.com/
+
+If it takes a while to load, the server may be starting up.
 
 ## The idea
 
