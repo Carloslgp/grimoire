@@ -2,6 +2,8 @@
 
 **Track everything your way, no bureaucracy.**
 
+![Grimoire init](docs/grimoire-init.gif)
+
 Grimoire is a place to save the things you don't want to forget. Books you've read, songs you love, ideas you want to revisit, spells from your favorite game, anything. You decide what goes in, you decide how to label it, and the system stays out of your way.
 
 There are no buttons, no forms, no menus, no drop-downs, no "Are you sure?" pop-ups. You type, the grimoire answers. That's it.
@@ -17,8 +19,6 @@ Want a list of books? `add books "Dune" classic`. Want to track your workouts? `
 No setup, no configuration, no tutorial. Just write.
 
 ## A UI that feels like a world
-
-![Grimoire init](docs/grimoire-init.gif)
 
 The entire app lives inside a single screen built to look and behave like an old terminal, and almost every detail is there to sell that feeling.
 
